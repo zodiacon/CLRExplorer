@@ -18,19 +18,25 @@
     <ClInclude Include="pch.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="CLRDiag.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="DataTarget.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="CLRDataTarget.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="LiveProcessDataTarget.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="sos.h">
+    <ClInclude Include="LiveDataTarget.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="xclrdata.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="sospriv.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="clrdata.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="dacprivate.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

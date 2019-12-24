@@ -8,12 +8,13 @@ const int WINDOW_MENU_POSITION = 3;
 
 #include "DataTarget.h"
 #include "TreeViewManager.h"
+#include "Interfaces.h"
 
 class CMainFrame : 
 	public CFrameWindowImpl<CMainFrame>, 
 	public CUpdateUI<CMainFrame>,
-	public CMessageFilter, public CIdleHandler
-{
+	public CMessageFilter, public CIdleHandler,
+	public IMainFrame {
 public:
 	DECLARE_FRAME_WND_CLASS(nullptr, IDR_MAINFRAME)
 
@@ -27,6 +28,9 @@ public:
 	BEGIN_UPDATE_UI_MAP(CMainFrame)
 		UPDATE_ELEMENT(ID_VIEW_TOOLBAR, UPDUI_MENUPOPUP)
 		UPDATE_ELEMENT(ID_VIEW_STATUS_BAR, UPDUI_MENUPOPUP)
+		UPDATE_ELEMENT(ID_WINDOW_CLOSE, UPDUI_MENUPOPUP | UPDUI_TOOLBAR)
+		UPDATE_ELEMENT(ID_TARGET_SUMMARY, UPDUI_MENUPOPUP | UPDUI_TOOLBAR)
+		UPDATE_ELEMENT(ID_TARGET_ALLASSEMBLIES, UPDUI_MENUPOPUP | UPDUI_TOOLBAR)
 	END_UPDATE_UI_MAP()
 
 	BEGIN_MSG_MAP(CMainFrame)
@@ -37,8 +41,10 @@ public:
 		COMMAND_ID_HANDLER(ID_VIEW_TOOLBAR, OnViewToolBar)
 		COMMAND_ID_HANDLER(ID_VIEW_STATUS_BAR, OnViewStatusBar)
 		COMMAND_ID_HANDLER(ID_APP_ABOUT, OnAppAbout)
+		COMMAND_ID_HANDLER(ID_VIEW_REFRESH, OnForwardMessage)
 		COMMAND_ID_HANDLER(ID_WINDOW_CLOSE, OnWindowClose)
 		COMMAND_ID_HANDLER(ID_WINDOW_CLOSE_ALL, OnWindowCloseAll)
+		COMMAND_RANGE_HANDLER(ID_TARGET_SUMMARY, ID_TARGET_THREADS, OnViewTargetData)
 		COMMAND_RANGE_HANDLER(ID_WINDOW_TABFIRST, ID_WINDOW_TABLAST, OnWindowActivate)
 		NOTIFY_HANDLER(IDC_TREE, NM_DBLCLK, OnTreeItemDoubleCLick)
 		CHAIN_MSG_MAP(CUpdateUI<CMainFrame>)
@@ -62,6 +68,16 @@ public:
 	LRESULT OnWindowActivate(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCtl*/, BOOL& /*bHandled*/);
 	LRESULT OnAttachToProcess(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCtl*/, BOOL& /*bHandled*/);
 	LRESULT OnTreeItemDoubleCLick(int /*idCtrl*/, LPNMHDR /*pnmh*/, BOOL& /*bHandled*/);
+	LRESULT OnForwardMessage(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCtl*/, BOOL& /*bHandled*/);
+	LRESULT OnViewTargetData(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCtl*/, BOOL& /*bHandled*/);
+
+	void InitCommandBar();
+	void InitToolBar(CToolBarCtrl& tb);
+
+	// IMainFrame
+	int FindTab(DWORD_PTR data) override;
+	void SwitchToPage(int page) override;
+	void AddTab(DWORD_PTR type) override;
 
 private:
 	std::unique_ptr<DataTarget> m_DataTarget;
@@ -70,4 +86,5 @@ private:
 	CSplitterWindow m_Splitter;
 	CTreeViewCtrlEx m_TreeView;
 	TreeViewManager m_TreeMgr;
+
 };

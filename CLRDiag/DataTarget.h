@@ -3,7 +3,34 @@
 #include <atlcomcli.h>
 #include <atlstr.h>
 #include <clrdata.h>
-#include "CLRDiag.h"
+//#include "CLRDiag.h"
+#include "dacprivate.h"
+
+struct AppDomainInfo : DacpAppDomainData {
+	CString Name;
+};
+
+struct AssemblyInfo : DacpAssemblyData {
+	CString Name;
+};
+
+struct MethodTableInfo : DacpMethodTableData {
+	DWORD Index;
+	CString Name;
+};
+
+enum class ThreadType {
+	Unknown = 0,
+	ThreadPoolWorker,
+	Finalizer,
+};
+
+struct ThreadInfo : DacpThreadData {
+	ULONGLONG StackLow;
+	ULONGLONG StackHigh;
+	ULONGLONG StackCurrent;
+	ThreadType Type;
+};
 
 class DataTarget abstract {
 public:
@@ -21,26 +48,29 @@ public:
 	std::vector<AppDomainInfo> EnumAppDomains();
 	std::vector<AssemblyInfo> EnumAssemblies(AppDomainInfo& ad);
 	std::vector<AssemblyInfo> EnumAssemblies(CLRDATA_ADDRESS appDomainAddress);
-	std::vector<AssemblyInfo> EnumAssemblies();
-	std::vector<ModuleData> EnumModules(const AssemblyData& assembly);
-	std::vector<ModuleData> EnumModules(CLRDATA_ADDRESS assembly);
-	std::vector<ModuleData> EnumModulesInAppDomain(const AppDomainData& ad);
-	std::vector<ModuleData> EnumModulesInAppDomain(CLRDATA_ADDRESS addr);
-	std::vector<ModuleData> EnumModules();
+	std::vector<AssemblyInfo> EnumAssemblies(bool includeSysSharedDomains = false);
+	std::vector<DacpModuleData> EnumModules(const DacpAssemblyData& assembly);
+	std::vector<DacpModuleData> EnumModules(CLRDATA_ADDRESS assembly);
+	std::vector<DacpModuleData> EnumModulesInAppDomain(const DacpAppDomainData& ad);
+	std::vector<DacpModuleData> EnumModulesInAppDomain(CLRDATA_ADDRESS addr);
+	std::vector<DacpModuleData> EnumModules();
+
 	AppDomainInfo GetSharedDomain();
 	AppDomainInfo GetSystemDomain();
+	int GetAppDomainCount() const;
 	AppDomainInfo GetAppDomainInfo(CLRDATA_ADDRESS addr);
 	std::vector<MethodTableInfo> EnumMethodTables(CLRDATA_ADDRESS module);
+	DacpGcHeapData GetGCInfo() const;
 
-	HeapDetails GetWksHeap();
-	std::vector<V45ObjectData> EnumObjects(int gen);
+	DacpGcHeapDetails GetWksHeap();
+	std::vector<DacpObjectData> EnumObjects(int gen);
 
-	ThreadPoolData GetThreadPoolData();
+	DacpThreadpoolData GetThreadPoolData();
 	std::vector<ThreadInfo> EnumThreads();
-	ThreadStoreData GetThreadsStats();
+	DacpThreadStoreData GetThreadsStats();
 	
 protected:
-	void EnumModulesInternal(CLRDATA_ADDRESS assembly, std::vector<ModuleData>& modules);
+	void EnumModulesInternal(CLRDATA_ADDRESS assembly, std::vector<DacpModuleData>& modules);
 	void EnumAssembliesInternal(CLRDATA_ADDRESS appDomain, std::vector<AssemblyInfo>& assemblies);
 
 	virtual HRESULT Init() = 0;

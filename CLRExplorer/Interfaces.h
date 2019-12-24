@@ -1,5 +1,15 @@
 #pragma once
 
+enum class NodeType {
+	Root,
+	Summary,
+	AppDomains,
+	AllAssemblies,
+	AllModules,
+	ThreadPool,
+	Threads
+};
+
 struct IGenericListViewCallback {
 	virtual int GetItemCount() = 0;
 	virtual bool Init(CListViewCtrl& lv) = 0;
@@ -21,4 +31,10 @@ struct IGenericListViewCallback {
 struct IToolBarProvider {
 	virtual bool Init(CToolBarCtrl& tb) = 0;
 	virtual bool OnCommand(WORD id) = 0;
+};
+
+struct IMainFrame {
+	virtual int FindTab(DWORD_PTR data) = 0;
+	virtual void SwitchToPage(int page) = 0;
+	virtual void AddTab(DWORD_PTR type) = 0;
 };

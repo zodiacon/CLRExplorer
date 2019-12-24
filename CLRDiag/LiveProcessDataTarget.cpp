@@ -2,9 +2,8 @@
 #include "LiveProcessDataTarget.h"
 #include <metahost.h>
 #include <string>
-#include "CLRDataTarget.h"
-#include "CLRDiag.h"
-#include "sos.h"
+#include "LiveDataTarget.h"
+#include "DataTarget.h"
 #include <winternl.h>
 
 #pragma comment(lib, "mscoree")
@@ -65,8 +64,8 @@ HRESULT LiveProcessDataTarget::Init() {
 		return hr;
 	_clrTarget = target;
 
-	CComPtr<ISosDac> spSos;
-	hr = pCLRCreateData(__uuidof(ISosDac), target,  reinterpret_cast<void**>(&spSos));
+	CComPtr<ISOSDacInterface> spSos;
+	hr = pCLRCreateData(__uuidof(ISOSDacInterface), target,  reinterpret_cast<void**>(&spSos));
 	if (FAILED(hr))
 		return hr;
 

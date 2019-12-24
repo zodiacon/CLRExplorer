@@ -4,12 +4,14 @@
 #include "pch.h"
 #include "..\CLRDiag\DataTarget.h"
 
+CComModule _Module;
+
 void DumpAppDomainsAndAssemblies(DataTarget* dt) {
 	auto domains = dt->EnumAppDomains();
 	for (auto& ad : domains) {
-		printf("AppDomain: %ws (0x%p) (assemblies: %u)\n", (PCWSTR)ad.Name, (void*)ad.Address, ad.AssemblyCount);
+		printf("AppDomain: %ws (0x%p) (assemblies: %u)\n", (PCWSTR)ad.Name, (void*)ad.AppDomainPtr, ad.AssemblyCount);
 		for (auto& asminfo : dt->EnumAssemblies(ad)) {
-			printf("\t%ws (0x%p)\n", (PCWSTR)asminfo.Name, (void*)asminfo.Address);
+			printf("\t%ws (0x%p)\n", (PCWSTR)asminfo.Name, (void*)asminfo.AssemblyPtr);
 		}
 	}
 }
@@ -20,19 +22,22 @@ void DumpThreadPool(DataTarget* dt) {
 
 void DumpModules(DataTarget* dt, bool includeMethodTables) {
 	for (auto& m : dt->EnumModules()) {
-		printf("Module 0x%p Asm: 0x%p ID: 0x%p Index: %u IL: 0x%p\n", (void*)m.Address, (void*)m.Assembly, (void*)m.ModuleID, m.ModuleIndex, (void*)m.ILBase);
+		printf("Module 0x%p Asm: 0x%p ID: 0x%p Index: %u IL: 0x%p\n", (void*)m.Address, (void*)m.Assembly, (void*)m.dwModuleID, m.dwModuleIndex, (void*)m.ilBase);
 		if (includeMethodTables) {
 			auto mts = dt->EnumMethodTables(m.Address);
 			for (auto& mt : mts)
-				printf("Index: %u %ws Size: %d Ifaces: %u Methods: %u Virt: %u\n", mt.Index, (PCWSTR)mt.Name, mt.BaseSize, mt.NumInterfaces, mt.NumMethods, mt.NumVirtuals);
+				printf("Index: %u %ws Size: %d Ifaces: %u Methods: %u Virt: %u\n", mt.Index, (PCWSTR)mt.Name, mt.BaseSize, mt.wNumInterfaces, mt.wNumMethods, mt.wNumVirtuals);
 		}
 	}
 }
 
 void DumpThreads(DataTarget* dt) {
 	for (auto& data : dt->EnumThreads()) {
-		printf("MID: %2d OSID: %5u TEB: 0x%p State: 0x%X\n", data.ManagedThreadId, data.OSThreadId, (void*)data.Teb, data.State);
+		printf("MID: %2d OSID: %5u TEB: 0x%p State: 0x%X\n", data.corThreadId, data.osThreadId, (void*)data.teb, data.state);
 	}
+}
+
+void DumpHandles(DataTarget* dt) {
 }
 
 int main(int argc, const char* argv[]) {
@@ -57,6 +62,7 @@ int main(int argc, const char* argv[]) {
 	DumpThreadPool(dt.get());
 	DumpThreads(dt.get());
 	DumpModules(dt.get(), true);
+	DumpHandles(dt.get());
 
 	if(suspended)
 		dt->Resume();

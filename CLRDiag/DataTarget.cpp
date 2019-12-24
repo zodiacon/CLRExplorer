@@ -1,8 +1,10 @@
 #include "pch.h"
 #include "DataTarget.h"
-#include "CLRDiag.h"
+//#include "CLRDiag.h"
 #include "LiveProcessDataTarget.h"
-#include "sos.h"
+//#include "sos.h"
+//#include "sospriv.h"
+#include "dacprivate.h"
 
 //CComModule _Module;
 
@@ -14,9 +16,9 @@ std::unique_ptr<DataTarget> DataTarget::FromProcessId(DWORD pid) {
 std::vector<AppDomainInfo> DataTarget::EnumAppDomains() {
 	std::vector<AppDomainInfo> domains;
 
-	CComQIPtr<ISosDac> spSos(_spSos);
+	CComQIPtr<ISOSDacInterface> spSos(_spSos);
 	CLRDATA_ADDRESS addr[64];
-	DWORD needed;
+	unsigned needed;
 	auto hr = spSos->GetAppDomainList(_countof(addr), addr, &needed);
 	if (FAILED(hr))
 		return domains;
@@ -30,51 +32,51 @@ std::vector<AppDomainInfo> DataTarget::EnumAppDomains() {
 }
 
 std::vector<AssemblyInfo> DataTarget::EnumAssemblies(AppDomainInfo& ad) {
-	return EnumAssemblies(ad.Address);
+	return EnumAssemblies(ad.AppDomainPtr);
 }
 
-std::vector<ModuleData> DataTarget::EnumModules(const AssemblyData& assembly) {
-	return EnumModules(assembly.Address);
+std::vector<DacpModuleData> DataTarget::EnumModules(const DacpAssemblyData& assembly) {
+	return EnumModules(assembly.AssemblyPtr);
 }
 
-std::vector<ModuleData> DataTarget::EnumModules(CLRDATA_ADDRESS assembly) {
-	std::vector<ModuleData> modules;
+std::vector<DacpModuleData> DataTarget::EnumModules(CLRDATA_ADDRESS assembly) {
+	std::vector<DacpModuleData> modules;
 	EnumModulesInternal(assembly, modules);
 	return modules;
 }
 
-std::vector<ModuleData> DataTarget::EnumModulesInAppDomain(const AppDomainData& ad) {
-	return EnumModulesInAppDomain(ad.Address);
+std::vector<DacpModuleData> DataTarget::EnumModulesInAppDomain(const DacpAppDomainData& ad) {
+	return EnumModulesInAppDomain(ad.AppDomainPtr);
 }
 
-void DataTarget::EnumModulesInternal(CLRDATA_ADDRESS assembly, std::vector<ModuleData>& modules) {
-	CComQIPtr<ISosDac> spSos(_spSos);
+void DataTarget::EnumModulesInternal(CLRDATA_ADDRESS assembly, std::vector<DacpModuleData>& modules) {
+	CComQIPtr<ISOSDacInterface> spSos(_spSos);
 	CLRDATA_ADDRESS addr[16];
-	DWORD count;
+	unsigned count;
 	auto hr = spSos->GetAssemblyModuleList(assembly, _countof(addr), addr, &count);
 	if (FAILED(hr))
 		return;
 
 	modules.reserve(count);
 	for (DWORD i = 0; i < count; i++) {
-		ModuleData data;
+		DacpModuleData data;
 		spSos->GetModuleData(addr[i], &data);
 		modules.push_back(data);
 	}
 }
 
 void DataTarget::EnumAssembliesInternal(CLRDATA_ADDRESS appDomain, std::vector<AssemblyInfo>& assemblies) {
-	CComQIPtr<ISosDac> spSos(_spSos);
+	CComQIPtr<ISOSDacInterface> spSos(_spSos);
 	CLRDATA_ADDRESS addr[512];
-	DWORD count;
+	int count;
 	if (FAILED(spSos->GetAssemblyList(appDomain, _countof(addr), addr, &count)))
 		return;
 
 	WCHAR name[512];
-	DWORD len;
+	unsigned len;
 	for (DWORD i = 0; i < count; i++) {
 		AssemblyInfo data;
-		if(FAILED(spSos->GetAssemblyData(appDomain, addr[i], &data)))
+		if (FAILED(spSos->GetAssemblyData(appDomain, addr[i], &data)))
 			continue;
 		spSos->GetAssemblyName(addr[i], _countof(name), name, &len);
 		data.Name = name;
@@ -83,11 +85,11 @@ void DataTarget::EnumAssembliesInternal(CLRDATA_ADDRESS appDomain, std::vector<A
 	}
 }
 
-std::vector<ModuleData> DataTarget::EnumModulesInAppDomain(CLRDATA_ADDRESS addr) {
-	std::vector<ModuleData> modules;
-	CComQIPtr<ISosDac> spSos(_spSos);
+std::vector<DacpModuleData> DataTarget::EnumModulesInAppDomain(CLRDATA_ADDRESS addr) {
+	std::vector<DacpModuleData> modules;
+	CComQIPtr<ISOSDacInterface> spSos(_spSos);
 	CLRDATA_ADDRESS assemblies[512];
-	DWORD count;
+	int count;
 	if (FAILED(spSos->GetAssemblyList(addr, _countof(assemblies), assemblies, &count)))
 		return modules;
 
@@ -98,16 +100,16 @@ std::vector<ModuleData> DataTarget::EnumModulesInAppDomain(CLRDATA_ADDRESS addr)
 	return modules;
 }
 
-std::vector<ModuleData> DataTarget::EnumModules() {
-	CComQIPtr<ISosDac> spSos(_spSos);
-	std::vector<ModuleData> modules;
+std::vector<DacpModuleData> DataTarget::EnumModules() {
+	CComQIPtr<ISOSDacInterface> spSos(_spSos);
+	std::vector<DacpModuleData> modules;
 	CLRDATA_ADDRESS addr[16];
-	DWORD needed;
+	unsigned needed;
 	auto hr = spSos->GetAppDomainList(_countof(addr), addr, &needed);
 	if (FAILED(hr))
 		return modules;
 
-	DWORD count;
+	int count;
 	CLRDATA_ADDRESS assemblies[512];
 	for (DWORD i = 0; i < needed; i++) {
 		spSos->GetAssemblyList(addr[i], _countof(assemblies), assemblies, &count);
@@ -118,25 +120,32 @@ std::vector<ModuleData> DataTarget::EnumModules() {
 }
 
 AppDomainInfo DataTarget::GetSharedDomain() {
-	CComQIPtr<ISosDac> spSos(_spSos);
-	AppDomainStoreData data;
+	CComQIPtr<ISOSDacInterface> spSos(_spSos);
+	DacpAppDomainStoreData data;
 	auto hr = spSos->GetAppDomainStoreData(&data);
 	ATLASSERT(SUCCEEDED(hr));
-	return GetAppDomainInfo(data.SharedDomain);
+	return GetAppDomainInfo(data.sharedDomain);
 }
 
 AppDomainInfo DataTarget::GetSystemDomain() {
-	CComQIPtr<ISosDac> spSos(_spSos);
-	AppDomainStoreData data;
+	CComQIPtr<ISOSDacInterface> spSos(_spSos);
+	DacpAppDomainStoreData data;
 	spSos->GetAppDomainStoreData(&data);
-	return GetAppDomainInfo(data.SystemDomain);
+	return GetAppDomainInfo(data.systemDomain);
+}
+
+int DataTarget::GetAppDomainCount() const {
+	CComQIPtr<ISOSDacInterface> spSos(_spSos);
+	DacpAppDomainStoreData data;
+	spSos->GetAppDomainStoreData(&data);
+	return data.DomainCount;
 }
 
 AppDomainInfo DataTarget::GetAppDomainInfo(CLRDATA_ADDRESS addr) {
-	CComQIPtr<ISosDac> spSos(_spSos);
+	CComQIPtr<ISOSDacInterface> spSos(_spSos);
 	AppDomainInfo data;
 	WCHAR name[MAX_PATH];
-	DWORD len;
+	unsigned len;
 	spSos->GetAppDomainData(addr, &data);
 	spSos->GetAppDomainName(addr, _countof(name), name, &len);
 	data.Name = name;
@@ -144,18 +153,18 @@ AppDomainInfo DataTarget::GetAppDomainInfo(CLRDATA_ADDRESS addr) {
 }
 
 std::vector<MethodTableInfo> DataTarget::EnumMethodTables(CLRDATA_ADDRESS module) {
-	CComQIPtr<ISosDac> spSos(_spSos);
+	CComQIPtr<ISOSDacInterface> spSos(_spSos);
 	std::vector<std::pair<ULONGLONG, DWORD>> addr;
 	addr.reserve(1024);
-	spSos->TraverseModuleMap(0, module, [](auto index, auto mt, auto param) {
+	spSos->TraverseModuleMap(TYPEDEFTOMETHODTABLE, module, [](auto index, auto mt, auto param) {
 		auto vec = (std::vector<std::pair<ULONGLONG, DWORD>>*)param;
 		vec->push_back({ mt, index });
-		}, (LPARAM)&addr);
+		}, &addr);
 
 	std::vector<MethodTableInfo> mts;
 	mts.reserve(addr.size());
 	WCHAR name[512];
-	DWORD count;
+	unsigned count;
 	for (auto& [mt, index] : addr) {
 		MethodTableInfo data;
 		spSos->GetMethodTableData(mt, &data);
@@ -168,23 +177,30 @@ std::vector<MethodTableInfo> DataTarget::EnumMethodTables(CLRDATA_ADDRESS module
 	return mts;
 }
 
-HeapDetails DataTarget::GetWksHeap() {
-	CComQIPtr<ISosDac> spSos(_spSos);
-	HeapDetails details = { 0 };
+DacpGcHeapData DataTarget::GetGCInfo() const {
+	CComQIPtr<ISOSDacInterface> spSos(_spSos);
+	DacpGcHeapData info;
+	spSos->GetGCHeapData(&info);
+	return info;
+}
+
+DacpGcHeapDetails DataTarget::GetWksHeap() {
+	CComQIPtr<ISOSDacInterface> spSos(_spSos);
+	DacpGcHeapDetails details;
 	spSos->GetGCHeapStaticData(&details);
 	return details;
 }
 
-std::vector<V45ObjectData> DataTarget::EnumObjects(int gen) {
-	return std::vector<V45ObjectData>();
+std::vector<DacpObjectData> DataTarget::EnumObjects(int gen) {
+	return std::vector<DacpObjectData>();
 }
 
 std::vector<AssemblyInfo> DataTarget::EnumAssemblies(CLRDATA_ADDRESS appDomainAddress) {
 	std::vector<AssemblyInfo> assemblies;
 
-	CComQIPtr<ISosDac> spSos(_spSos);
+	CComQIPtr<ISOSDacInterface> spSos(_spSos);
 	CLRDATA_ADDRESS addr[1024];
-	DWORD count;
+	int count;
 	auto hr = spSos->GetAssemblyList(appDomainAddress, _countof(addr), addr, &count);
 	if (FAILED(hr))
 		return assemblies;
@@ -194,11 +210,11 @@ std::vector<AssemblyInfo> DataTarget::EnumAssemblies(CLRDATA_ADDRESS appDomainAd
 	return assemblies;
 }
 
-std::vector<AssemblyInfo> DataTarget::EnumAssemblies() {
+std::vector<AssemblyInfo> DataTarget::EnumAssemblies(bool includeSysSharedDomains) {
 	std::vector<AssemblyInfo> assemblies;
-	CComQIPtr<ISosDac> spSos(_spSos);
+	CComQIPtr<ISOSDacInterface> spSos(_spSos);
 	CLRDATA_ADDRESS addr[64];
-	DWORD needed;
+	unsigned needed;
 	auto hr = spSos->GetAppDomainList(_countof(addr), addr, &needed);
 	if (FAILED(hr))
 		return assemblies;
@@ -206,38 +222,44 @@ std::vector<AssemblyInfo> DataTarget::EnumAssemblies() {
 	for (DWORD i = 0; i < needed; i++) {
 		EnumAssembliesInternal(addr[i], assemblies);
 	}
+	if (includeSysSharedDomains) {
+		DacpAppDomainStoreData data;
+		spSos->GetAppDomainStoreData(&data);
+		EnumAssembliesInternal(data.sharedDomain, assemblies);
+		EnumAssembliesInternal(data.systemDomain, assemblies);
+	}
 	return assemblies;
 }
 
-ThreadPoolData DataTarget::GetThreadPoolData() {
-	CComQIPtr<ISosDac> spSos(_spSos);
-	ThreadPoolData data;
+DacpThreadpoolData DataTarget::GetThreadPoolData() {
+	CComQIPtr<ISOSDacInterface> spSos(_spSos);
+	DacpThreadpoolData data;
 	spSos->GetThreadpoolData(&data);
 	return data;
 }
 
 std::vector<ThreadInfo> DataTarget::EnumThreads() {
 	std::vector<ThreadInfo> threads;
-	CComQIPtr<ISosDac> spSos(_spSos);
+	CComQIPtr<ISOSDacInterface> spSos(_spSos);
 	ATLASSERT(spSos);
 
 	auto stat = GetThreadsStats();
-	threads.reserve(stat.ThreadCount + 10);
-	for (auto addr = stat.FirstThread; addr; ) {
+	threads.reserve(stat.threadCount + 10);
+	for (auto addr = stat.firstThread; addr; ) {
 		ThreadInfo data;
 		spSos->GetThreadData(addr, &data);
 		spSos->GetStackLimits(addr, &data.StackLow, &data.StackHigh, &data.StackCurrent);
 		threads.emplace_back(data);
-		addr = data.NextThread;
+		addr = data.nextThread;
 	}
 	return threads;
 }
 
-ThreadStoreData DataTarget::GetThreadsStats() {
-	CComQIPtr<ISosDac> spSos(_spSos);
+DacpThreadStoreData DataTarget::GetThreadsStats() {
+	CComQIPtr<ISOSDacInterface> spSos(_spSos);
 	ATLASSERT(spSos);
 
-	ThreadStoreData stat;
+	DacpThreadStoreData stat;
 	spSos->GetThreadStoreData(&stat);
 
 	return stat;

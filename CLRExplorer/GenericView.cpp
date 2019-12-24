@@ -12,7 +12,6 @@ CGenericView::CGenericView(IGenericListViewCallback* listCB, IToolBarProvider* t
 }
 
 BOOL CGenericView::PreTranslateMessage(MSG* pMsg) {
-	pMsg;
 	return FALSE;
 }
 
@@ -23,8 +22,6 @@ void CGenericView::OnFinalMessage(HWND /*hWnd*/) {
 LRESULT CGenericView::OnCreate(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/, BOOL& /*bHandled*/) {
 	m_ListView.Create(*this, rcDefault, nullptr, WS_CHILD | WS_VISIBLE | WS_CLIPSIBLINGS | WS_CLIPCHILDREN | LVS_REPORT | LVS_OWNERDATA | LVS_SINGLESEL);
 	m_ListView.SetExtendedListViewStyle(LVS_EX_FULLROWSELECT | LVS_EX_DOUBLEBUFFER);
-	if (!m_ListViewCB->Init(m_ListView))
-		return -1;
 
 	m_ToolBar.Create(*this, rcDefault, nullptr, WS_CHILD | WS_VISIBLE | WS_CLIPCHILDREN | WS_CLIPSIBLINGS);
 	if (m_ToolBarCB && !m_ToolBarCB->Init(m_ToolBar))
@@ -54,10 +51,26 @@ LRESULT CGenericView::OnSize(UINT, WPARAM, LPARAM lParam, BOOL&) {
 	return 0;
 }
 
-LRESULT CGenericView::OnCommand(UINT, WPARAM wParam, LPARAM, BOOL& handled) {
+LRESULT CGenericView::OnCommand(UINT message, WPARAM wParam, LPARAM lParam, BOOL& handled) {
+	handled = FALSE;
 	if (m_ToolBarCB)
 		handled = m_ToolBarCB->OnCommand(LOWORD(wParam));
-	return 0;
+	LRESULT result = 0;
+	if (!handled) {
+		handled = ProcessWindowMessage(*this, message, wParam, lParam, result, 1);
+	}
+	return result;
+}
+
+LRESULT CGenericView::OnForwardMessage(UINT, WPARAM, LPARAM lParam, BOOL& handled) {
+	LRESULT result;
+	auto msg = reinterpret_cast<MSG*>(lParam);
+	handled = ProcessWindowMessage(*this, msg->message, msg->wParam, msg->lParam, result, 1);
+	return result;
+}
+
+LRESULT CGenericView::OnRefresh(WORD, WORD, HWND, BOOL&) {
+	return LRESULT();
 }
 
 

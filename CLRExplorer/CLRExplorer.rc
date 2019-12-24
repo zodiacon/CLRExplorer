@@ -46,30 +46,6 @@ END
 
 /////////////////////////////////////////////////////////////////////////////
 //
-// Toolbar
-//
-
-IDR_MAINFRAME TOOLBAR 16, 15
-BEGIN
-    BUTTON      ID_FILE_OPEN
-    SEPARATOR
-    BUTTON      ID_EDIT_COPY
-    BUTTON      ID_EDIT_PASTE
-    SEPARATOR
-    BUTTON      ID_APP_ABOUT
-END
-
-
-/////////////////////////////////////////////////////////////////////////////
-//
-// Bitmap
-//
-
-IDR_MAINFRAME           BITMAP                  "res\\Toolbar.bmp"
-
-
-/////////////////////////////////////////////////////////////////////////////
-//
 // Menu
 //
 
@@ -91,6 +67,17 @@ BEGIN
     BEGIN
         MENUITEM "&Toolbar",                    ID_VIEW_TOOLBAR
         MENUITEM "&Status Bar",                 ID_VIEW_STATUS_BAR
+        MENUITEM SEPARATOR
+        MENUITEM "&Refresh\tF5",                ID_VIEW_REFRESH
+    END
+    POPUP "&Target"
+    BEGIN
+        MENUITEM "&Summary",                    ID_TARGET_SUMMARY
+        MENUITEM "&AppDomains",                 ID_TARGET_APPDOMAINS
+        MENUITEM "All A&ssemblies",             ID_TARGET_ALLASSEMBLIES
+        MENUITEM "All &Modules",                ID_TARGET_ALLMODULES
+        MENUITEM "&Thread Pool",                ID_TARGET_THREADPOOL
+        MENUITEM "Th&reads",                    ID_TARGET_THREADS
     END
     POPUP "&Window"
     BEGIN
@@ -142,6 +129,8 @@ IDI_THREAD              ICON                    "res\\threads-filled.ico"
 IDI_THREADPOOL          ICON                    "res\\threads-cloud-filled.ico"
 
 IDI_INFO                ICON                    "res\\button-info.ico"
+
+IDI_ASSEMBLY_DYNAMIC    ICON                    "res\\assembly-filled-gear.ico"
 
 
 /////////////////////////////////////////////////////////////////////////////
@@ -213,8 +202,8 @@ BEGIN
     VK_DELETE,      ID_EDIT_CUT,            VIRTKEY, SHIFT
     VK_INSERT,      ID_EDIT_COPY,           VIRTKEY, CONTROL
     VK_INSERT,      ID_EDIT_PASTE,          VIRTKEY, SHIFT
-    VK_F6,          ID_NEXT_PANE,           VIRTKEY 
-    VK_F6,          ID_PREV_PANE,           VIRTKEY, SHIFT
+    VK_F6,          ID_FILE_ATTACHTOPROCESS, VIRTKEY 
+    VK_F5,          ID_VIEW_REFRESH,        VIRTKEY 
 END
 
 

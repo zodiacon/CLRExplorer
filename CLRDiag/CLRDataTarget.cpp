@@ -1,5 +1,5 @@
 #include "pch.h"
-#include "CLRDataTarget.h"
+#include "LiveDataTarget.h"
 #include "DataTarget.h"
 
 HRESULT CCLRDataTarget::Init(DataTarget* dt) {

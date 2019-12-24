@@ -153,12 +153,14 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="CLRDataTarget.h" />
-    <ClInclude Include="CLRDiag.h" />
+    <ClInclude Include="clrdata.h" />
+    <ClInclude Include="dacprivate.h" />
+    <ClInclude Include="LiveDataTarget.h" />
     <ClInclude Include="DataTarget.h" />
     <ClInclude Include="LiveProcessDataTarget.h" />
     <ClInclude Include="pch.h" />
-    <ClInclude Include="sos.h" />
+    <ClInclude Include="sospriv.h" />
+    <ClInclude Include="xclrdata.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="CLRDataTarget.cpp" />

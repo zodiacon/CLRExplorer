@@ -8,6 +8,8 @@ class CProcessSelectDlg :
 	public CVirtualListView<CProcessSelectDlg>,
 	public CCustomDraw<CProcessSelectDlg>{
 public:
+	friend struct CVirtualListView<CProcessSelectDlg>;
+
 	enum class RuntimeType {
 		DesktopClr,
 		CoreClr
@@ -43,6 +45,9 @@ public:
 		CHAIN_MSG_MAP(CCustomDraw<CProcessSelectDlg>)
 	END_MSG_MAP()
 
+protected:
+	void DoSort(const SortInfo* si);
+
 private:
 	LRESULT OnInitDialog(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/, BOOL& /*bHandled*/);
 	LRESULT OnCloseCmd(WORD /*wNotifyCode*/, WORD wID, HWND /*hWndCtl*/, BOOL& /*bHandled*/);
@@ -53,6 +58,7 @@ private:
 	void InitProcessList();
 	void EnumProcesses();
 	bool IsManagedProcess(DWORD pid, RuntimeType& rt, ProcessArch& arch) const;
+	static bool CompareItems(const ProcessInfo& p1, const ProcessInfo& p2, int col, bool asc);
 
 private:
 	std::vector<ProcessInfo> m_Items;

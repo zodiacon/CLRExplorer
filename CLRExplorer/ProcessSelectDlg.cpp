@@ -2,10 +2,18 @@
 #include "ProcessSelectDlg.h"
 #include <string>
 #include <TlHelp32.h>
+#include <algorithm>
+#include "SortHelper.h"
 
 int CProcessSelectDlg::GetSelectedProcess(CString& name) const {
 	name = m_Name;
 	return m_SelectedPid;
+}
+
+void CProcessSelectDlg::DoSort(const SortInfo* si) {
+	std::sort(m_Items.begin(), m_Items.end(), [si](const auto& p1, const auto& p2) {
+		return CompareItems(p1, p2, si->SortColumn, si->SortAscending);
+		});
 }
 
 LRESULT CProcessSelectDlg::OnInitDialog(UINT, WPARAM, LPARAM, BOOL&) {
@@ -159,4 +167,16 @@ bool CProcessSelectDlg::IsManagedProcess(DWORD pid, RuntimeType& rt, ProcessArch
 	::CloseHandle(hSnapshot);
 
 	return found;
+}
+
+bool CProcessSelectDlg::CompareItems(const ProcessInfo& p1, const ProcessInfo& p2, int col, bool asc) {
+	switch (col) {
+		case 0:	return SortHelper::SortStrings(p1.Name, p2.Name, asc);
+		case 1: return SortHelper::SortNumbers(p1.Id, p2.Id, asc);
+		case 2: return SortHelper::SortNumbers(p1.Session, p2.Session, asc);
+		case 3: return SortHelper::SortNumbers((int)p1.Runtime, (int)p2.Runtime, asc);
+		case 4: return SortHelper::SortNumbers((int)p1.Arch, (int)p2.Arch, asc);
+	}
+	ATLASSERT(false);
+	return false;
 }

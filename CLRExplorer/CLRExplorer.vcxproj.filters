@@ -48,6 +48,18 @@
     <ClCompile Include="SummaryView.cpp">
       <Filter>Views</Filter>
     </ClCompile>
+    <ClCompile Include="TabFactory.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="SortHelper.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="AssembliesView.cpp">
+      <Filter>Views</Filter>
+    </ClCompile>
+    <ClCompile Include="FormatHelper.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="MainFrm.h">
@@ -83,6 +95,18 @@
     <ClInclude Include="SummaryView.h">
       <Filter>Views</Filter>
     </ClInclude>
+    <ClInclude Include="TabFactory.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="SortHelper.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="AssembliesView.h">
+      <Filter>Views</Filter>
+    </ClInclude>
+    <ClInclude Include="FormatHelper.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="CLRExplorer.rc">
@@ -90,9 +114,6 @@
     </ResourceCompile>
   </ItemGroup>
   <ItemGroup>
-    <Image Include="res\toolbar.bmp">
-      <Filter>Resource Files</Filter>
-    </Image>
     <Image Include="res\application.ico">
       <Filter>Resource Files\Icons</Filter>
     </Image>
@@ -139,6 +160,9 @@
       <Filter>Resource Files\Icons</Filter>
     </Image>
     <Image Include="res\button-info.ico">
+      <Filter>Resource Files\Icons</Filter>
+    </Image>
+    <Image Include="res\assembly-filled-gear.ico">
       <Filter>Resource Files\Icons</Filter>
     </Image>
   </ItemGroup>
