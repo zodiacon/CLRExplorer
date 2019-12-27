@@ -132,6 +132,14 @@ IDI_INFO                ICON                    "res\\button-info.ico"
 
 IDI_ASSEMBLY_DYNAMIC    ICON                    "res\\assembly-filled-gear.ico"
 
+IDI_SYNCBLK             ICON                    "res\\padlock-filled.ico"
+
+IDI_LOCK_OPEN           ICON                    "res\\padlock-open-filled.ico"
+
+IDI_LOCK_LOCKED         ICON                    "res\\padlock-round-filled.ico"
+
+IDI_THREAD_DEAD         ICON                    "res\\threads-dead.ico"
+
 
 /////////////////////////////////////////////////////////////////////////////
 //

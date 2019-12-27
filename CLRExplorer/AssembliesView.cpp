@@ -13,7 +13,7 @@ int AssembliesView::GetItemCount() {
 	return static_cast<int>(_items.size());
 }
 
-bool AssembliesView::Init(CListViewCtrl& lv) {
+bool AssembliesView::Init(CListViewCtrl& lv, IGenericListView* glv) {
 	lv.InsertColumn(0, L"Name", LVCFMT_LEFT, 250);
 	lv.InsertColumn(1, L"Address", LVCFMT_RIGHT, 130);
 	lv.InsertColumn(2, L"AppDomain", LVCFMT_RIGHT, 130);

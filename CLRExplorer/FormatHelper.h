@@ -1,5 +1,7 @@
 #pragma once
 
+#include <string>
+
 struct FormatHelper {
 	template<typename T>
 	static CString ToHex(T value) {
@@ -9,9 +11,12 @@ struct FormatHelper {
 	}
 
 	template<typename T>
-	static CString ToDec(T value) {
+	static CString ToDec(T value, int digits = 0) {
 		CString text;
-		text.Format(L"%u", value);
+		if (digits == 0)
+			text.Format(L"%u", value);
+		else
+			text.Format((L"%" + std::to_wstring(digits) + L"u").c_str(), value);
 		return text;
 	}
 

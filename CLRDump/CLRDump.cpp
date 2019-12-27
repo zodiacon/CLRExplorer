@@ -1,6 +1,3 @@
-// CLRDump.cpp : This file contains the 'main' function. Program execution begins and ends there.
-//
-
 #include "pch.h"
 #include "..\CLRDiag\DataTarget.h"
 
@@ -22,7 +19,7 @@ void DumpThreadPool(DataTarget* dt) {
 
 void DumpModules(DataTarget* dt, bool includeMethodTables) {
 	for (auto& m : dt->EnumModules()) {
-		printf("Module 0x%p Asm: 0x%p ID: 0x%p Index: %u IL: 0x%p\n", (void*)m.Address, (void*)m.Assembly, (void*)m.dwModuleID, m.dwModuleIndex, (void*)m.ilBase);
+		printf("Module 0x%p Asm: 0x%p ID: 0x%p Index: %llu IL: 0x%p\n", (void*)m.Address, (void*)m.Assembly, (void*)m.dwModuleID, m.dwModuleIndex, (void*)m.ilBase);
 		if (includeMethodTables) {
 			auto mts = dt->EnumMethodTables(m.Address);
 			for (auto& mt : mts)
@@ -32,13 +29,18 @@ void DumpModules(DataTarget* dt, bool includeMethodTables) {
 }
 
 void DumpThreads(DataTarget* dt) {
-	for (auto& data : dt->EnumThreads()) {
+	for (auto& data : dt->EnumThreads(false)) {
 		printf("MID: %2d OSID: %5u TEB: 0x%p State: 0x%X\n", data.corThreadId, data.osThreadId, (void*)data.teb, data.state);
 	}
 }
 
 void DumpHandles(DataTarget* dt) {
 }
+
+void DumpSyncBlocks(DataTarget* dt) {
+	auto sbs = dt->EnumSyncBlocks(false);
+}
+
 
 int main(int argc, const char* argv[]) {
 	if (argc < 2) {
@@ -63,6 +65,7 @@ int main(int argc, const char* argv[]) {
 	DumpThreads(dt.get());
 	DumpModules(dt.get(), true);
 	DumpHandles(dt.get());
+	DumpSyncBlocks(dt.get());
 
 	if(suspended)
 		dt->Resume();

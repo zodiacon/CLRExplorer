@@ -3,9 +3,9 @@
 #include "Interfaces.h"
 #include "DataTarget.h"
 
-class AssembliesView : public IGenericListViewCallback {
+class SyncBlocksView : public IGenericListViewCallback {
 public:
-	AssembliesView(DataTarget* dt);
+	SyncBlocksView(DataTarget* dt);
 
 	// IGenericListViewCallback
 	int GetItemCount() override;
@@ -14,10 +14,8 @@ public:
 	bool Sort(int column, bool ascending) override;
 	int GetIcon(int row) override;
 
-	static bool CompareItems(const AssemblyInfo& a1, const AssemblyInfo& a2, int col, bool asc);
-
 private:
 	DataTarget* _target;
-	std::vector<AssemblyInfo> _items;
+	std::vector<SyncBlockInfo> _items;
 };
 

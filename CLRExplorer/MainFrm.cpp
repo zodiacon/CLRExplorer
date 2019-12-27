@@ -11,6 +11,8 @@
 #include "ProcessSelectDlg.h"
 #include "TabFactory.h"
 
+const int WINDOW_MENU_POSITION = 4;
+
 CMainFrame::CMainFrame() : m_TreeMgr(m_TreeView, this) {
 }
 

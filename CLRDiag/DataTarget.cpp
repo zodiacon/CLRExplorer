@@ -74,7 +74,7 @@ void DataTarget::EnumAssembliesInternal(CLRDATA_ADDRESS appDomain, std::vector<A
 
 	WCHAR name[512];
 	unsigned len;
-	for (DWORD i = 0; i < count; i++) {
+	for (int i = 0; i < count; i++) {
 		AssemblyInfo data;
 		if (FAILED(spSos->GetAssemblyData(appDomain, addr[i], &data)))
 			continue;
@@ -94,7 +94,7 @@ std::vector<DacpModuleData> DataTarget::EnumModulesInAppDomain(CLRDATA_ADDRESS a
 		return modules;
 
 	modules.reserve(count);
-	for (DWORD i = 0; i < count; i++) {
+	for (int i = 0; i < count; i++) {
 		EnumModulesInternal(assemblies[i], modules);
 	}
 	return modules;
@@ -113,10 +113,43 @@ std::vector<DacpModuleData> DataTarget::EnumModules() {
 	CLRDATA_ADDRESS assemblies[512];
 	for (DWORD i = 0; i < needed; i++) {
 		spSos->GetAssemblyList(addr[i], _countof(assemblies), assemblies, &count);
-		for (DWORD j = 0; j < count; j++)
+		for (int j = 0; j < count; j++)
 			EnumModulesInternal(assemblies[j], modules);
 	}
 	return modules;
+}
+
+std::vector<SyncBlockInfo> DataTarget::EnumSyncBlocks(bool includeFree) {
+	std::vector<SyncBlockInfo> sbs;
+
+	CComQIPtr<ISOSDacInterface> spSos(_spSos);
+	SyncBlockInfo data;
+	auto hr = spSos->GetSyncBlockData(1, &data);
+	if (FAILED(hr))	// no sync blocks
+		return sbs;
+
+	sbs.reserve(64);
+	if (includeFree || !data.bFree) {
+		data.Index = 1;
+		sbs.push_back(data);
+	}
+	auto count = data.SyncBlockCount;
+	for(UINT i = 1; i <= count; i++) {
+		spSos->GetSyncBlockData(i, &data);
+		if (includeFree || !data.bFree) {
+			data.Index = i;
+			sbs.push_back(data);
+		}
+	}
+
+	return sbs;
+}
+
+DacpThreadData DataTarget::GetThreadData(CLRDATA_ADDRESS addr) {
+	CComQIPtr<ISOSDacInterface> spSos(_spSos);
+	DacpThreadData data;
+	spSos->GetThreadData(addr, &data);
+	return data;
 }
 
 AppDomainInfo DataTarget::GetSharedDomain() {
@@ -156,7 +189,7 @@ std::vector<MethodTableInfo> DataTarget::EnumMethodTables(CLRDATA_ADDRESS module
 	CComQIPtr<ISOSDacInterface> spSos(_spSos);
 	std::vector<std::pair<ULONGLONG, DWORD>> addr;
 	addr.reserve(1024);
-	spSos->TraverseModuleMap(TYPEDEFTOMETHODTABLE, module, [](auto index, auto mt, auto param) {
+	spSos->TraverseModuleMap(TYPEDEFTOMETHODTABLE, module, [](UINT index, CLRDATA_ADDRESS mt, PVOID param) {
 		auto vec = (std::vector<std::pair<ULONGLONG, DWORD>>*)param;
 		vec->push_back({ mt, index });
 		}, &addr);
@@ -238,7 +271,7 @@ DacpThreadpoolData DataTarget::GetThreadPoolData() {
 	return data;
 }
 
-std::vector<ThreadInfo> DataTarget::EnumThreads() {
+std::vector<ThreadInfo> DataTarget::EnumThreads(bool includeDeadThreads) {
 	std::vector<ThreadInfo> threads;
 	CComQIPtr<ISOSDacInterface> spSos(_spSos);
 	ATLASSERT(spSos);
@@ -248,8 +281,10 @@ std::vector<ThreadInfo> DataTarget::EnumThreads() {
 	for (auto addr = stat.firstThread; addr; ) {
 		ThreadInfo data;
 		spSos->GetThreadData(addr, &data);
-		spSos->GetStackLimits(addr, &data.StackLow, &data.StackHigh, &data.StackCurrent);
-		threads.emplace_back(data);
+		if (includeDeadThreads || data.osThreadId > 0) {
+			spSos->GetStackLimits(addr, &data.StackLow, &data.StackHigh, &data.StackCurrent);
+			threads.emplace_back(data);
+		}
 		addr = data.nextThread;
 	}
 	return threads;

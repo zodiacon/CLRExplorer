@@ -223,7 +223,9 @@
     <ClCompile Include="ProcessSelectDlg.cpp" />
     <ClCompile Include="SortHelper.cpp" />
     <ClCompile Include="SummaryView.cpp" />
+    <ClCompile Include="SyncBlocksView.cpp" />
     <ClCompile Include="TabFactory.cpp" />
+    <ClCompile Include="ThreadsView.cpp" />
     <ClCompile Include="TreeViewManager.cpp" />
     <ClCompile Include="GenericView.cpp" />
   </ItemGroup>
@@ -239,7 +241,9 @@
     <ClInclude Include="pch.h" />
     <ClInclude Include="SortHelper.h" />
     <ClInclude Include="SummaryView.h" />
+    <ClInclude Include="SyncBlocksView.h" />
     <ClInclude Include="TabFactory.h" />
+    <ClInclude Include="ThreadsView.h" />
     <ClInclude Include="TreeViewManager.h" />
     <ClInclude Include="GenericView.h" />
     <ClInclude Include="VirtualListView.h" />
@@ -261,9 +265,13 @@
     <Image Include="res\module-filled.ico" />
     <Image Include="res\open-filled.ico" />
     <Image Include="res\package-filled.ico" />
+    <Image Include="res\padlock-filled.ico" />
+    <Image Include="res\padlock-open-filled.ico" />
+    <Image Include="res\padlock-round-filled.ico" />
     <Image Include="res\pin-green-filled.ico" />
     <Image Include="res\process-attach.ico" />
     <Image Include="res\threads-cloud-filled.ico" />
+    <Image Include="res\threads-dead.ico" />
     <Image Include="res\threads-filled.ico" />
   </ItemGroup>
   <ItemGroup>

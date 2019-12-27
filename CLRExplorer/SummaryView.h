@@ -9,7 +9,7 @@ public:
 
 	// IGenericListViewCallback
 	int GetItemCount() override;
-	bool Init(CListViewCtrl& lv) override;
+	bool Init(CListViewCtrl& lv, IGenericListView* glv) override;
 	CString GetItemText(int row, int col) override;
 	bool Sort(int column, bool ascending) override;
 	bool CanSort(int col) const override;

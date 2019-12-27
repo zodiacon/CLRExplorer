@@ -4,6 +4,8 @@
 #include "SummaryView.h"
 #include "GenericView.h"
 #include "AssembliesView.h"
+#include "SyncBlocksView.h"
+#include "ThreadsView.h"
 
 HWND TabFactory::CreateTab(DataTarget* dt, DWORD_PTR type, HWND hParent, int& image) {
 	HWND hTab = nullptr;
@@ -23,6 +25,24 @@ HWND TabFactory::CreateTab(DataTarget* dt, DWORD_PTR type, HWND hParent, int& im
 			auto view = new CGenericView(impl);
 			hTab = view->Create(hParent, CRect(), L"All Assemblies", WS_CHILD | WS_VISIBLE | WS_CLIPCHILDREN | WS_CLIPSIBLINGS);
 			image = 2;
+			break;
+		}
+
+		case NodeType::SyncBlocks:
+		{
+			auto impl = new SyncBlocksView(dt);
+			auto view = new CGenericView(impl);
+			hTab = view->Create(hParent, CRect(), L"Sync Blocks", WS_CHILD | WS_VISIBLE | WS_CLIPCHILDREN | WS_CLIPSIBLINGS);
+			image = 7;
+			break;
+		}
+
+		case NodeType::Threads:
+		{
+			auto impl = new ThreadsView(dt);
+			auto view = new CGenericView(impl, impl);
+			hTab = view->Create(hParent, CRect(), L"Threads", WS_CHILD | WS_VISIBLE | WS_CLIPCHILDREN | WS_CLIPSIBLINGS);
+			image = 5;
 			break;
 		}
 

@@ -16,7 +16,7 @@ int SummaryView::GetItemCount() {
 	return _countof(names);
 }
 
-bool SummaryView::Init(CListViewCtrl& lv) {
+bool SummaryView::Init(CListViewCtrl& lv, IGenericListView* glv) {
 	lv.InsertColumn(0, L"Name", LVCFMT_LEFT, 200);
 	lv.InsertColumn(1, L"Value", LVCFMT_LEFT, 300);
 

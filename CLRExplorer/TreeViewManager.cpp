@@ -13,7 +13,8 @@ void TreeViewManager::InitOnce() {
 	images.Create(size, size, ILC_COLOR32, 16, 8);
 
 	UINT icons[] = {
-		IDI_APP, IDI_PACKAGE, IDI_ASSEMBLY, IDI_MODULE, IDI_THREADPOOL, IDI_THREAD, IDI_INFO
+		IDI_APP, IDI_PACKAGE, IDI_ASSEMBLY, IDI_MODULE, IDI_THREADPOOL, IDI_THREAD, IDI_INFO,
+		IDI_SYNCBLK
 	};
 
 	for (auto id : icons)
@@ -38,7 +39,10 @@ bool TreeViewManager::Init(DataTarget* dt, PCWSTR name) {
 	assemblies.SetData((DWORD_PTR)NodeType::AllAssemblies);
 	auto modules = root.AddTail(L"All Modules", 3);
 	auto threadPool = root.AddTail(L"Thread Pool", 4);
-	auto thread = root.AddTail(L"Threads", 5);
+	auto threads = root.AddTail(L"Threads", 5);
+	threads.SetData((DWORD_PTR)NodeType::Threads);
+	auto syncBlocks = root.AddTail(L"Sync Blocks", 7);
+	syncBlocks.SetData((DWORD_PTR)NodeType::SyncBlocks);
 
 	root.Expand(TVE_EXPAND);
 

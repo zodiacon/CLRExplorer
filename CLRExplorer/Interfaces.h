@@ -7,12 +7,18 @@ enum class NodeType {
 	AllAssemblies,
 	AllModules,
 	ThreadPool,
-	Threads
+	Threads,
+	GCHeap,
+	SyncBlocks
+};
+
+struct IGenericListView {
+	virtual void Refresh() = 0;
 };
 
 struct IGenericListViewCallback {
 	virtual int GetItemCount() = 0;
-	virtual bool Init(CListViewCtrl& lv) = 0;
+	virtual bool Init(CListViewCtrl& lv, IGenericListView* glv) = 0;
 	virtual CString GetItemText(int row, int col) = 0;
 	virtual int GetIcon(int row) {
 		return -1;

@@ -19,6 +19,10 @@ struct MethodTableInfo : DacpMethodTableData {
 	CString Name;
 };
 
+struct SyncBlockInfo : DacpSyncBlockData {
+	int Index;
+};
+
 enum class ThreadType {
 	Unknown = 0,
 	ThreadPoolWorker,
@@ -54,6 +58,8 @@ public:
 	std::vector<DacpModuleData> EnumModulesInAppDomain(const DacpAppDomainData& ad);
 	std::vector<DacpModuleData> EnumModulesInAppDomain(CLRDATA_ADDRESS addr);
 	std::vector<DacpModuleData> EnumModules();
+	std::vector<SyncBlockInfo> EnumSyncBlocks(bool includeFree);
+	DacpThreadData GetThreadData(CLRDATA_ADDRESS addr);
 
 	AppDomainInfo GetSharedDomain();
 	AppDomainInfo GetSystemDomain();
@@ -66,7 +72,7 @@ public:
 	std::vector<DacpObjectData> EnumObjects(int gen);
 
 	DacpThreadpoolData GetThreadPoolData();
-	std::vector<ThreadInfo> EnumThreads();
+	std::vector<ThreadInfo> EnumThreads(bool includeDeadThreads);
 	DacpThreadStoreData GetThreadsStats();
 	
 protected:

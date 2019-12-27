@@ -79,6 +79,9 @@ bool LiveProcessDataTarget::FindModule(PCWSTR name, CString& path) const {
 		return false;
 
 	auto hSnapshot = ::CreateToolhelp32Snapshot(TH32CS_SNAPMODULE, _pid);
+	if (hSnapshot == INVALID_HANDLE_VALUE)
+		return false;
+
 	MODULEENTRY32 me;
 	me.dwSize = sizeof(me);
 	Module32First(hSnapshot, &me);

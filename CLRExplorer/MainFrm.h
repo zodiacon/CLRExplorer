@@ -4,8 +4,6 @@
 
 #pragma once
 
-const int WINDOW_MENU_POSITION = 3;
-
 #include "DataTarget.h"
 #include "TreeViewManager.h"
 #include "Interfaces.h"

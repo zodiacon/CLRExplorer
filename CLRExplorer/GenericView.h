@@ -9,7 +9,7 @@
 
 class CGenericView : public CWindowImpl<CGenericView> {
 public:
-	DECLARE_WND_CLASS(nullptr)
+	DECLARE_WND_CLASS_EX(nullptr, 0, COLOR_WINDOW);
 
 	CGenericView(IGenericListViewCallback* listCB, IToolBarProvider* tbCB = nullptr);
 
@@ -19,7 +19,7 @@ public:
 
 	BEGIN_MSG_MAP(CGenericView)
 		MESSAGE_HANDLER(WM_CREATE, OnCreate)
-		MESSAGE_HANDLER(WM_ERASEBKGND, OnEraseBkgnd)
+		//MESSAGE_HANDLER(WM_ERASEBKGND, OnEraseBkgnd)
 		MESSAGE_HANDLER(WM_SIZE, OnSize)
 		MESSAGE_HANDLER(WM_COMMAND, OnCommand)
 		MESSAGE_HANDLER(WM_FORWARDMSG, OnForwardMessage)

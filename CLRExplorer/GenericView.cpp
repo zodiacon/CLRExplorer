@@ -23,7 +23,9 @@ LRESULT CGenericView::OnCreate(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam
 	m_ListView.Create(*this, rcDefault, nullptr, WS_CHILD | WS_VISIBLE | WS_CLIPSIBLINGS | WS_CLIPCHILDREN | LVS_REPORT | LVS_OWNERDATA | LVS_SINGLESEL);
 	m_ListView.SetExtendedListViewStyle(LVS_EX_FULLROWSELECT | LVS_EX_DOUBLEBUFFER);
 
-	m_ToolBar.Create(*this, rcDefault, nullptr, WS_CHILD | WS_VISIBLE | WS_CLIPCHILDREN | WS_CLIPSIBLINGS);
+	m_ToolBar.Create(*this, rcDefault, nullptr, 
+		WS_CHILD | WS_VISIBLE | WS_CLIPCHILDREN | WS_CLIPSIBLINGS | WS_BORDER | TBSTYLE_FLAT | TBSTYLE_TOOLTIPS, 
+		WS_EX_CLIENTEDGE);
 	if (m_ToolBarCB && !m_ToolBarCB->Init(m_ToolBar))
 		return -1;
 
@@ -70,7 +72,9 @@ LRESULT CGenericView::OnForwardMessage(UINT, WPARAM, LPARAM lParam, BOOL& handle
 }
 
 LRESULT CGenericView::OnRefresh(WORD, WORD, HWND, BOOL&) {
-	return LRESULT();
+	m_ListView.Refresh();
+
+	return 0;
 }
 
 

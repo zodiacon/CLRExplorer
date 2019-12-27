@@ -22,6 +22,11 @@
 #define IDI_THREADPOOL                  216
 #define IDI_INFO                        217
 #define IDI_ASSEMBLY_DYNAMIC            218
+#define IDI_SYNCBLK                     219
+#define IDI_LOCK_OPEN                   220
+#define IDI_LOCK_LOCKED                 221
+#define IDI_ICON1                       222
+#define IDI_THREAD_DEAD                 222
 #define IDC_PROCLIST                    1000
 #define ID_WINDOW_CLOSE                 32772
 #define ID_WINDOW_CLOSE_ALL             32773
@@ -38,7 +43,7 @@
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        219
+#define _APS_NEXT_RESOURCE_VALUE        223
 #define _APS_NEXT_COMMAND_VALUE         32784
 #define _APS_NEXT_CONTROL_VALUE         1001
 #define _APS_NEXT_SYMED_VALUE           102

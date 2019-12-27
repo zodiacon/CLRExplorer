@@ -60,6 +60,12 @@
     <ClCompile Include="FormatHelper.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="SyncBlocksView.cpp">
+      <Filter>Views</Filter>
+    </ClCompile>
+    <ClCompile Include="ThreadsView.cpp">
+      <Filter>Views</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="MainFrm.h">
@@ -106,6 +112,12 @@
     </ClInclude>
     <ClInclude Include="FormatHelper.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="SyncBlocksView.h">
+      <Filter>Views</Filter>
+    </ClInclude>
+    <ClInclude Include="ThreadsView.h">
+      <Filter>Views</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -164,6 +176,18 @@
     </Image>
     <Image Include="res\assembly-filled-gear.ico">
       <Filter>Resource Files\Icons</Filter>
+    </Image>
+    <Image Include="res\padlock-filled.ico">
+      <Filter>Resource Files\Icons</Filter>
+    </Image>
+    <Image Include="res\padlock-open-filled.ico">
+      <Filter>Resource Files\Icons</Filter>
+    </Image>
+    <Image Include="res\padlock-round-filled.ico">
+      <Filter>Resource Files\Icons</Filter>
+    </Image>
+    <Image Include="res\threads-dead.ico">
+      <Filter>Resource Files</Filter>
     </Image>
   </ItemGroup>
   <ItemGroup>
