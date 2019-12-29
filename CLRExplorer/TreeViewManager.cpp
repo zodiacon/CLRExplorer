@@ -14,7 +14,7 @@ void TreeViewManager::InitOnce() {
 
 	UINT icons[] = {
 		IDI_APP, IDI_PACKAGE, IDI_ASSEMBLY, IDI_MODULE, IDI_THREADPOOL, IDI_THREAD, IDI_INFO,
-		IDI_SYNCBLK
+		IDI_SYNCBLK, IDI_MEMORY, IDI_STRING
 	};
 
 	for (auto id : icons)
@@ -38,11 +38,15 @@ bool TreeViewManager::Init(DataTarget* dt, PCWSTR name) {
 	auto assemblies = root.AddTail(L"All Assemblies", 2);
 	assemblies.SetData((DWORD_PTR)NodeType::AllAssemblies);
 	auto modules = root.AddTail(L"All Modules", 3);
-	auto threadPool = root.AddTail(L"Thread Pool", 4);
+	auto heaps = root.AddTail(L"GC Heaps", 8);
+	heaps.SetData((DWORD_PTR)NodeType::GCHeaps);
 	auto threads = root.AddTail(L"Threads", 5);
 	threads.SetData((DWORD_PTR)NodeType::Threads);
+	auto threadPool = root.AddTail(L"Thread Pool", 4);
 	auto syncBlocks = root.AddTail(L"Sync Blocks", 7);
 	syncBlocks.SetData((DWORD_PTR)NodeType::SyncBlocks);
+	auto strings = root.AddTail(L"All Strings", 9);
+	strings.SetData((DWORD_PTR)NodeType::AllStrings);
 
 	root.Expand(TVE_EXPAND);
 

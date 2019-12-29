@@ -66,6 +66,12 @@
     <ClCompile Include="ThreadsView.cpp">
       <Filter>Views</Filter>
     </ClCompile>
+    <ClCompile Include="ObjectsView.cpp">
+      <Filter>Views</Filter>
+    </ClCompile>
+    <ClCompile Include="StringsView.cpp">
+      <Filter>Views</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="MainFrm.h">
@@ -117,6 +123,12 @@
       <Filter>Views</Filter>
     </ClInclude>
     <ClInclude Include="ThreadsView.h">
+      <Filter>Views</Filter>
+    </ClInclude>
+    <ClInclude Include="ObjectsView.h">
+      <Filter>Views</Filter>
+    </ClInclude>
+    <ClInclude Include="StringsView.h">
       <Filter>Views</Filter>
     </ClInclude>
   </ItemGroup>
@@ -187,7 +199,16 @@
       <Filter>Resource Files\Icons</Filter>
     </Image>
     <Image Include="res\threads-dead.ico">
-      <Filter>Resource Files</Filter>
+      <Filter>Resource Files\Icons</Filter>
+    </Image>
+    <Image Include="res\clipboard-copy.ico">
+      <Filter>Resource Files\Icons</Filter>
+    </Image>
+    <Image Include="res\memory-filled.ico">
+      <Filter>Resource Files\Icons</Filter>
+    </Image>
+    <Image Include="res\string.ico">
+      <Filter>Resource Files\Icons</Filter>
     </Image>
   </ItemGroup>
   <ItemGroup>

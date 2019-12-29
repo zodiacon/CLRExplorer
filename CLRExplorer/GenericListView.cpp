@@ -8,6 +8,8 @@ CGenericListView::CGenericListView(IGenericListViewCallback* cb, bool autoDelete
 }
 
 void CGenericListView::DoSort(const SortInfo* si) {
+	if (si == nullptr)
+		return;
 	m_Callback->Sort(si->SortColumn, si->SortAscending);
 	RedrawItems(GetTopIndex(), GetTopIndex() + GetCountPerPage());
 }
@@ -18,6 +20,11 @@ bool CGenericListView::IsSortable(int column) const {
 
 void CGenericListView::Refresh() {
 	SetItemCount(m_Callback->GetItemCount());
+}
+
+void CGenericListView::SetListViewItemCount(int count) {
+	SetItemCountEx(count, LVSICF_NOSCROLL);
+	DoSort(GetSortInfo());
 }
 
 LRESULT CGenericListView::OnCreate(UINT, WPARAM, LPARAM, BOOL&) {

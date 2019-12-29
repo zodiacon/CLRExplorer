@@ -11,7 +11,7 @@ class CGenericView : public CWindowImpl<CGenericView> {
 public:
 	DECLARE_WND_CLASS_EX(nullptr, 0, COLOR_WINDOW);
 
-	CGenericView(IGenericListViewCallback* listCB, IToolBarProvider* tbCB = nullptr);
+	CGenericView(IGenericListViewCallback* listCB, IToolBarProvider* tbCB = nullptr, IDialogBarProvider* dialogBar = nullptr);
 
 	BOOL PreTranslateMessage(MSG* pMsg);
 
@@ -19,7 +19,6 @@ public:
 
 	BEGIN_MSG_MAP(CGenericView)
 		MESSAGE_HANDLER(WM_CREATE, OnCreate)
-		//MESSAGE_HANDLER(WM_ERASEBKGND, OnEraseBkgnd)
 		MESSAGE_HANDLER(WM_SIZE, OnSize)
 		MESSAGE_HANDLER(WM_COMMAND, OnCommand)
 		MESSAGE_HANDLER(WM_FORWARDMSG, OnForwardMessage)
@@ -34,7 +33,6 @@ public:
 	//	LRESULT NotifyHandler(int /*idCtrl*/, LPNMHDR /*pnmh*/, BOOL& /*bHandled*/)
 
 	LRESULT OnCreate(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/, BOOL& /*bHandled*/);
-	LRESULT OnEraseBkgnd(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/, BOOL& /*bHandled*/);
 	LRESULT OnSize(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/, BOOL& /*bHandled*/);
 	LRESULT OnCommand(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/, BOOL& /*bHandled*/);
 	LRESULT OnForwardMessage(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/, BOOL& /*bHandled*/);
@@ -44,5 +42,7 @@ private:
 	CGenericListView m_ListView;
 	CToolBarCtrl m_ToolBar;
 	IToolBarProvider* m_ToolBarCB;
+	IDialogBarProvider* m_DialogBar;
+	HWND m_hWndDialogBar{ nullptr };
 	IGenericListViewCallback* m_ListViewCB;
 };

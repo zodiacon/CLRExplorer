@@ -6,7 +6,7 @@
 class CGenericListView :
 	public CVirtualListView<CGenericListView>,
 	public CWindowImpl<CGenericListView, CListViewCtrl>,
-	public IGenericListView {
+	public IGenericView {
 public:
 	DECLARE_WND_SUPERCLASS(nullptr, CListViewCtrl::GetWndClassName())
 
@@ -27,6 +27,7 @@ public:
 	void DoSort(const SortInfo* si);
 	bool IsSortable(int column) const;
 	void Refresh() override;
+	void SetListViewItemCount(int count) override;
 
 private:
 	LRESULT OnCreate(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/, BOOL& /*bHandled*/);

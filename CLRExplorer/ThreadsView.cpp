@@ -11,15 +11,15 @@ int ThreadsView::GetItemCount() {
 	return static_cast<int>(_threads.size());
 }
 
-bool ThreadsView::Init(CListViewCtrl& lv, IGenericListView* glv) {
+bool ThreadsView::Init(CListViewCtrl& lv, IGenericView* glv) {
 	_glv = glv;
 
 	lv.InsertColumn(0, L"Managed ID", LVCFMT_CENTER, 80);
 	lv.InsertColumn(1, L"OS ID", LVCFMT_RIGHT, 120);
 	lv.InsertColumn(2, L"State", LVCFMT_RIGHT, 90);
 	lv.InsertColumn(3, L"Locks", LVCFMT_CENTER, 70);
-	lv.InsertColumn(4, L"TEB", LVCFMT_RIGHT, 90);
-	lv.InsertColumn(5, L"Details", LVCFMT_LEFT, 420);
+	lv.InsertColumn(4, L"TEB", LVCFMT_RIGHT, 120);
+	lv.InsertColumn(5, L"Details", LVCFMT_LEFT, 450);
 
 	CImageList images;
 	images.Create(16, 16, ILC_COLOR32, 2, 2);

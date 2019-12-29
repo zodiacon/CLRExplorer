@@ -1,6 +1,6 @@
 #pragma once
 
-enum class NodeType {
+enum class NodeType : size_t {
 	Root,
 	Summary,
 	AppDomains,
@@ -8,17 +8,23 @@ enum class NodeType {
 	AllModules,
 	ThreadPool,
 	Threads,
-	GCHeap,
-	SyncBlocks
+	GCHeaps,
+	SyncBlocks,
+	AllStrings
 };
 
-struct IGenericListView {
+struct IGenericView {
 	virtual void Refresh() = 0;
+	virtual void SetListViewItemCount(int count) = 0;
+};
+
+struct IDialogBarProvider {
+	virtual HWND Create(HWND hParent) = 0;
 };
 
 struct IGenericListViewCallback {
 	virtual int GetItemCount() = 0;
-	virtual bool Init(CListViewCtrl& lv, IGenericListView* glv) = 0;
+	virtual bool Init(CListViewCtrl& lv, IGenericView* glv) = 0;
 	virtual CString GetItemText(int row, int col) = 0;
 	virtual int GetIcon(int row) {
 		return -1;

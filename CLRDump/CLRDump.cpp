@@ -41,6 +41,10 @@ void DumpSyncBlocks(DataTarget* dt) {
 	auto sbs = dt->EnumSyncBlocks(false);
 }
 
+void DumpObjects(DataTarget* dt) {
+	//auto objects = dt->EnumObjects();
+	//printf("%zu objects\n", objects.size());
+}
 
 int main(int argc, const char* argv[]) {
 	if (argc < 2) {
@@ -60,12 +64,13 @@ int main(int argc, const char* argv[]) {
 	if(!suspended)
 		printf("Failed to suspend process\n");
 
-	DumpAppDomainsAndAssemblies(dt.get());
-	DumpThreadPool(dt.get());
-	DumpThreads(dt.get());
-	DumpModules(dt.get(), true);
-	DumpHandles(dt.get());
-	DumpSyncBlocks(dt.get());
+	DumpObjects(dt.get());
+	//DumpAppDomainsAndAssemblies(dt.get());
+	//DumpThreadPool(dt.get());
+	//DumpThreads(dt.get());
+	//DumpModules(dt.get(), true);
+	//DumpHandles(dt.get());
+	//DumpSyncBlocks(dt.get());
 
 	if(suspended)
 		dt->Resume();

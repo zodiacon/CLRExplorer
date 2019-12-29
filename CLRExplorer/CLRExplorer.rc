@@ -61,7 +61,6 @@ BEGIN
     POPUP "&Edit"
     BEGIN
         MENUITEM "&Copy\tCtrl+C",               ID_EDIT_COPY
-        MENUITEM "&Paste\tCtrl+V",              ID_EDIT_PASTE
     END
     POPUP "&View"
     BEGIN
@@ -76,8 +75,10 @@ BEGIN
         MENUITEM "&AppDomains",                 ID_TARGET_APPDOMAINS
         MENUITEM "All A&ssemblies",             ID_TARGET_ALLASSEMBLIES
         MENUITEM "All &Modules",                ID_TARGET_ALLMODULES
-        MENUITEM "&Thread Pool",                ID_TARGET_THREADPOOL
+        MENUITEM "&GC Heaps",                   ID_TARGET_GCHEAPS
         MENUITEM "Th&reads",                    ID_TARGET_THREADS
+        MENUITEM "Sync &Blocks",                ID_TARGET_SYNCBLOCKS
+        MENUITEM "&Thread Pool",                ID_TARGET_THREADPOOL
     END
     POPUP "&Window"
     BEGIN
@@ -140,6 +141,12 @@ IDI_LOCK_LOCKED         ICON                    "res\\padlock-round-filled.ico"
 
 IDI_THREAD_DEAD         ICON                    "res\\threads-dead.ico"
 
+IDI_MEMORY              ICON                    "res\\memory-filled.ico"
+
+IDI_COPY                ICON                    "res\\clipboard-copy.ico"
+
+IDI_STRING              ICON                    "res\\string.ico"
+
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -166,6 +173,15 @@ BEGIN
     CONTROL         "",IDC_PROCLIST,"SysListView32",LVS_REPORT | LVS_SINGLESEL | LVS_SHOWSELALWAYS | LVS_ALIGNLEFT | LVS_OWNERDATA | WS_BORDER | WS_TABSTOP,7,7,373,229
 END
 
+IDD_STRINGS_DIALOGBAR DIALOGEX 0, 0, 330, 16
+STYLE DS_SETFONT | DS_FIXEDSYS | WS_CHILD
+FONT 8, "MS Shell Dlg", 400, 0, 0x0
+BEGIN
+    LTEXT           "Quick Find:",IDC_STATIC,7,4,36,8
+    EDITTEXT        IDC_TEXT,51,2,118,14,ES_AUTOHSCROLL
+    PUSHBUTTON      "Clear",IDC_CLEAR,175,2,33,14
+END
+
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -186,6 +202,14 @@ BEGIN
     IDD_PROCSELECT, DIALOG
     BEGIN
         RIGHTMARGIN, 380
+    END
+
+    IDD_STRINGS_DIALOGBAR, DIALOG
+    BEGIN
+        LEFTMARGIN, 6
+        RIGHTMARGIN, 323
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 9
     END
 END
 #endif    // APSTUDIO_INVOKED
@@ -269,6 +293,11 @@ BEGIN
     100, 0, 0, 0,
     100, 0, 0, 0,
     0, 0, 0, 0
+END
+
+IDD_STRINGS_DIALOGBAR AFX_DIALOG_LAYOUT
+BEGIN
+    0
 END
 
 

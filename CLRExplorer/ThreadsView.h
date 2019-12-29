@@ -9,7 +9,7 @@ public:
 
 	// IGenericListViewCallback
 	int GetItemCount() override;
-	bool Init(CListViewCtrl& lv, IGenericListView* glv) override;
+	bool Init(CListViewCtrl& lv, IGenericView* glv) override;
 	CString GetItemText(int row, int col) override;
 	bool Sort(int column, bool ascending) override;
 	int GetIcon(int row) override;
@@ -25,7 +25,7 @@ private:
 
 	DataTarget* _target;
 	std::vector<ThreadInfo> _threads;
-	IGenericListView* _glv;
+	IGenericView* _glv;
 	bool _showDeadObjects{ false };
 };
 

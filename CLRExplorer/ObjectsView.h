@@ -3,19 +3,18 @@
 #include "Interfaces.h"
 #include "DataTarget.h"
 
-class SummaryView : public IGenericListViewCallback {
+class ObjectsView : public IGenericListViewCallback {
 public:
-	SummaryView(DataTarget* target);
+	ObjectsView(DataTarget* dt);
 
 	// IGenericListViewCallback
 	int GetItemCount() override;
 	bool Init(CListViewCtrl& lv, IGenericView* glv) override;
 	CString GetItemText(int row, int col) override;
 	bool Sort(int column, bool ascending) override;
-	bool CanSort(int col) const override;
 
 private:
 	DataTarget* _target;
-	DacpThreadStoreData _threadStore;
+	std::vector<ObjectInfo> _objects;
 };
 

@@ -1,12 +1,18 @@
 #include "pch.h"
 #include "DataTarget.h"
-//#include "CLRDiag.h"
 #include "LiveProcessDataTarget.h"
-//#include "sos.h"
-//#include "sospriv.h"
 #include "dacprivate.h"
 
 //CComModule _Module;
+
+
+inline static size_t Align(size_t nbytes) {
+#ifdef _WIN64
+	return (nbytes + 7) & ~7;
+#else
+	return (nbytes + 3) & ~3;
+#endif
+}
 
 std::unique_ptr<DataTarget> DataTarget::FromProcessId(DWORD pid) {
 	std::unique_ptr<DataTarget> target = std::make_unique<LiveProcessDataTarget>(pid);
@@ -134,7 +140,7 @@ std::vector<SyncBlockInfo> DataTarget::EnumSyncBlocks(bool includeFree) {
 		sbs.push_back(data);
 	}
 	auto count = data.SyncBlockCount;
-	for(UINT i = 1; i <= count; i++) {
+	for (UINT i = 1; i <= count; i++) {
 		spSos->GetSyncBlockData(i, &data);
 		if (includeFree || !data.bFree) {
 			data.Index = i;
@@ -224,8 +230,32 @@ DacpGcHeapDetails DataTarget::GetWksHeap() {
 	return details;
 }
 
-std::vector<DacpObjectData> DataTarget::EnumObjects(int gen) {
-	return std::vector<DacpObjectData>();
+bool DataTarget::EnumObjects(EnumObjectCallback callback, void* userData) {
+	CComQIPtr<ISOSDacInterface> spSos(_spSos);
+	DacpGcHeapData data;
+	spSos->GetGCHeapData(&data);
+	CLRDATA_ADDRESS heaps[256];
+	unsigned count;
+	DacpGcHeapDetails details;
+	HRESULT hr;
+	if (data.bServerMode) {
+		hr = spSos->GetGCHeapList(_countof(heaps), heaps, &count);
+		if (FAILED(hr))
+			return false;
+		for (unsigned i = 0; i < count; i++) {
+			hr = spSos->GetGCHeapDetails(heaps[i], &details);
+			ATLASSERT(SUCCEEDED(hr));
+			if (!EnumObjectsInternal(details, callback, userData))
+				break;
+		}
+	}
+	else {
+		hr = spSos->GetGCHeapStaticData(&details);
+		if (FAILED(hr))
+			return false;
+		EnumObjectsInternal(details, callback, userData);
+	}
+	return true;
 }
 
 std::vector<AssemblyInfo> DataTarget::EnumAssemblies(CLRDATA_ADDRESS appDomainAddress) {
@@ -300,3 +330,116 @@ DacpThreadStoreData DataTarget::GetThreadsStats() {
 	return stat;
 }
 
+constexpr int min_obj_size = sizeof(BYTE*) + sizeof(PVOID) + sizeof(size_t);
+
+bool DataTarget::EnumObjectsInternal(DacpGcHeapDetails& heap, EnumObjectCallback callback, void* userData) {
+	DacpHeapSegmentData segdata;
+	CComQIPtr<ISOSDacInterface> spSos(_spSos);
+	ObjectInfo obj;
+	WCHAR text[256];
+
+	auto gen0start = heap.generation_table[0].allocation_start;
+	auto gen0end = heap.alloc_allocated;
+	auto segment = heap.generation_table[2].start_segment;
+	auto currentSeg = segment;
+	auto hr = segdata.Request(spSos, segment, heap);
+	ATLASSERT(SUCCEEDED(hr));
+
+	auto current = segdata.mem;
+	bool prevFree = false;
+
+	for (;;) {
+		auto segmentEnd = heap.alloc_allocated;
+		if (currentSeg == heap.ephemeral_heap_segment) {
+			if (current - sizeof(PVOID) == gen0end - Align(min_obj_size))
+				break;
+		}
+		if (current >= segmentEnd) {
+			if (current > segmentEnd)
+				break;
+
+			segment = segdata.next;
+			if (segment) {
+				if (segdata.Request(spSos, segment, heap) != S_OK)
+					break;
+				current = segdata.mem;
+				currentSeg = segment;
+			}
+			else
+				break;
+		}
+
+		if (currentSeg == heap.ephemeral_heap_segment && current >= gen0end) {
+			// something is wrong
+			break;
+		}
+		hr = spSos->GetObjectData(current, &obj);
+		if (FAILED(hr))
+			break;
+
+		obj.Address = current;
+		//obj.Generation = gen;
+		if (!callback(obj, userData))
+			return true;
+		current += Align(obj.Size);
+	}
+
+	// LOH
+
+	segment = heap.generation_table[3].start_segment;
+	currentSeg = segment;
+	if (segdata.Request(spSos, segment, heap) != S_OK)
+		return false;
+
+	current = segdata.mem;
+	for (;;) {
+		auto segmentEnd = segdata.used;
+		if (current >= segmentEnd) {
+			if (current > segmentEnd)
+				break;
+
+			segment = segdata.next;
+			if (segment) {
+				if (segdata.Request(spSos, segment, heap) != S_OK)
+					break;
+				current = segdata.mem;
+				currentSeg = segment;
+			}
+			else
+				break;
+		}
+
+		hr = spSos->GetObjectData(current, &obj);
+		if (FAILED(hr))
+			break;
+
+		if (obj.ObjectType == OBJ_STRING) {
+			unsigned len;
+			hr = spSos->GetObjectStringData(current, _countof(text), text, &len);
+			ATLASSERT(SUCCEEDED(hr));
+			obj.StringValue = text;
+		}
+		obj.Address = current;
+		obj.Generation = 3;
+		if (!callback(obj, userData))
+			return true;
+		current += Align(obj.Size);
+	}
+	return true;
+}
+
+CString DataTarget::GetObjectClassName(CLRDATA_ADDRESS address) {
+	WCHAR className[512];
+	unsigned len;
+	CComQIPtr<ISOSDacInterface> spSos(_spSos);
+	auto hr = spSos->GetObjectClassName(address, _countof(className), className, &len);
+	return hr == S_OK ? className : L"";
+}
+
+CString DataTarget::GetObjectString(CLRDATA_ADDRESS address, unsigned maxLength) {
+	auto buffer = std::make_unique<WCHAR[]>(maxLength);
+	CComQIPtr<ISOSDacInterface> spSos(_spSos);
+	unsigned len;
+	auto hr = spSos->GetObjectStringData(address, maxLength, buffer.get(), &len);
+	return FAILED(hr) ? L"" : buffer.get();
+}

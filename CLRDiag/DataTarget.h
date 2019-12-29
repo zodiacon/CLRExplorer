@@ -21,6 +21,7 @@ struct MethodTableInfo : DacpMethodTableData {
 
 struct SyncBlockInfo : DacpSyncBlockData {
 	int Index;
+	CString StringValue;
 };
 
 enum class ThreadType {
@@ -35,6 +36,14 @@ struct ThreadInfo : DacpThreadData {
 	ULONGLONG StackCurrent;
 	ThreadType Type;
 };
+
+struct ObjectInfo : DacpObjectData {
+	CLRDATA_ADDRESS Address;
+	int Generation;
+	CString StringValue;
+};
+
+using EnumObjectCallback = bool (*)(ObjectInfo& obj, void* userData);
 
 class DataTarget abstract {
 public:
@@ -59,7 +68,11 @@ public:
 	std::vector<DacpModuleData> EnumModulesInAppDomain(CLRDATA_ADDRESS addr);
 	std::vector<DacpModuleData> EnumModules();
 	std::vector<SyncBlockInfo> EnumSyncBlocks(bool includeFree);
+	bool EnumObjects(EnumObjectCallback callback, void* userData = nullptr);
+
 	DacpThreadData GetThreadData(CLRDATA_ADDRESS addr);
+	CString GetObjectClassName(CLRDATA_ADDRESS address);
+	CString GetObjectString(CLRDATA_ADDRESS address, unsigned maxLength = 256);
 
 	AppDomainInfo GetSharedDomain();
 	AppDomainInfo GetSystemDomain();
@@ -69,13 +82,13 @@ public:
 	DacpGcHeapData GetGCInfo() const;
 
 	DacpGcHeapDetails GetWksHeap();
-	std::vector<DacpObjectData> EnumObjects(int gen);
 
 	DacpThreadpoolData GetThreadPoolData();
 	std::vector<ThreadInfo> EnumThreads(bool includeDeadThreads);
 	DacpThreadStoreData GetThreadsStats();
 	
 protected:
+	bool EnumObjectsInternal(DacpGcHeapDetails& details, EnumObjectCallback callback, void* userData);
 	void EnumModulesInternal(CLRDATA_ADDRESS assembly, std::vector<DacpModuleData>& modules);
 	void EnumAssembliesInternal(CLRDATA_ADDRESS appDomain, std::vector<AssemblyInfo>& assemblies);
 

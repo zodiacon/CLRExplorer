@@ -214,6 +214,7 @@
     <ClCompile Include="FormatHelper.cpp" />
     <ClCompile Include="GenericListView.cpp" />
     <ClCompile Include="MainFrm.cpp" />
+    <ClCompile Include="ObjectsView.cpp" />
     <ClCompile Include="pch.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
@@ -222,6 +223,7 @@
     </ClCompile>
     <ClCompile Include="ProcessSelectDlg.cpp" />
     <ClCompile Include="SortHelper.cpp" />
+    <ClCompile Include="StringsView.cpp" />
     <ClCompile Include="SummaryView.cpp" />
     <ClCompile Include="SyncBlocksView.cpp" />
     <ClCompile Include="TabFactory.cpp" />
@@ -236,10 +238,12 @@
     <ClInclude Include="GenericListView.h" />
     <ClInclude Include="Interfaces.h" />
     <ClInclude Include="MainFrm.h" />
+    <ClInclude Include="ObjectsView.h" />
     <ClInclude Include="ProcessSelectDlg.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="pch.h" />
     <ClInclude Include="SortHelper.h" />
+    <ClInclude Include="StringsView.h" />
     <ClInclude Include="SummaryView.h" />
     <ClInclude Include="SyncBlocksView.h" />
     <ClInclude Include="TabFactory.h" />
@@ -258,10 +262,12 @@
     <Image Include="res\button-info.ico" />
     <Image Include="res\button-refresh.ico" />
     <Image Include="res\class-filled.ico" />
+    <Image Include="res\clipboard-copy.ico" />
     <Image Include="res\close-all.ico" />
     <Image Include="res\close.ico" />
     <Image Include="res\CLRExplorer.ico" />
     <Image Include="res\library.ico" />
+    <Image Include="res\memory-filled.ico" />
     <Image Include="res\module-filled.ico" />
     <Image Include="res\open-filled.ico" />
     <Image Include="res\package-filled.ico" />
@@ -270,6 +276,7 @@
     <Image Include="res\padlock-round-filled.ico" />
     <Image Include="res\pin-green-filled.ico" />
     <Image Include="res\process-attach.ico" />
+    <Image Include="res\string.ico" />
     <Image Include="res\threads-cloud-filled.ico" />
     <Image Include="res\threads-dead.ico" />
     <Image Include="res\threads-filled.ico" />

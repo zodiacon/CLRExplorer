@@ -4,6 +4,7 @@
 //
 #define IDD_ABOUTBOX                    100
 #define IDD_PROCSELECT                  101
+#define IDD_STRINGS_DIALOGBAR           103
 #define IDR_MAINFRAME                   128
 #define IDS_TITLE                       129
 #define IDI_APP                         203
@@ -25,9 +26,14 @@
 #define IDI_SYNCBLK                     219
 #define IDI_LOCK_OPEN                   220
 #define IDI_LOCK_LOCKED                 221
-#define IDI_ICON1                       222
 #define IDI_THREAD_DEAD                 222
+#define IDI_MEMORY                      223
+#define IDI_COPY                        224
+#define IDI_STRING                      225
 #define IDC_PROCLIST                    1000
+#define IDC_TEXT                        1001
+#define IDC_CLEAR                       1002
+#define IDC_BUTTON2                     1003
 #define ID_WINDOW_CLOSE                 32772
 #define ID_WINDOW_CLOSE_ALL             32773
 #define ID_FILE_ATTACHTOPROCESS         32775
@@ -38,14 +44,16 @@
 #define ID_TARGET_ALLMODULES            32780
 #define ID_TARGET_THREADPOOL            32781
 #define ID_TARGET_THREADS               32782
+#define ID_TARGET_GCHEAPS               32783
+#define ID_TARGET_SYNCBLOCKS            32784
 
 // Next default values for new objects
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        223
-#define _APS_NEXT_COMMAND_VALUE         32784
-#define _APS_NEXT_CONTROL_VALUE         1001
+#define _APS_NEXT_RESOURCE_VALUE        227
+#define _APS_NEXT_COMMAND_VALUE         32785
+#define _APS_NEXT_CONTROL_VALUE         1004
 #define _APS_NEXT_SYMED_VALUE           102
 #endif
 #endif
