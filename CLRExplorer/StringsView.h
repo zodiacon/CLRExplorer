@@ -3,6 +3,7 @@
 #include "Interfaces.h"
 #include "DataTarget.h"
 #include "resource.h"
+#include "QuickFIlterDialogBar.h"
 
 class StringsView : public IGenericListViewCallback, public IDialogBarProvider {
 public:
@@ -17,33 +18,16 @@ public:
 	// IGenericDialogBarProvider
 	HWND Create(HWND hParent) override;
 
-	void ApplyTextFilter(PCWSTR filter);
+	void SetFilter(PCWSTR filter);
 
 private:
-	class CDialogBar : public CDialogImpl<CDialogBar> {
+	class CDialogBar : public CQuickFilterDialogBar<CDialogBar> {
 	public:
-		CDialogBar(StringsView& view) : m_View(view) {}
+		CDialogBar(StringsView& view) : BaseClass(IDD_STRINGS_DIALOGBAR), m_View(view) {}
 
-		enum { IDD = IDD_STRINGS_DIALOGBAR };
-
-		BEGIN_MSG_MAP(CAboutDlg)
-			MESSAGE_HANDLER(WM_INITDIALOG, OnInitDialog)
-			MESSAGE_HANDLER(WM_TIMER, OnTimer)
-			MESSAGE_HANDLER(WM_CTLCOLORDLG, OnColorDialog)
-			MESSAGE_HANDLER(WM_CTLCOLORSTATIC, OnColorDialog)
-			COMMAND_CODE_HANDLER(EN_CHANGE, OnTextChanged)
-		END_MSG_MAP()
-
-		// Handler prototypes (uncomment arguments if needed):
-		//	LRESULT MessageHandler(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/, BOOL& /*bHandled*/)
-		//	LRESULT CommandHandler(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCtl*/, BOOL& /*bHandled*/)
-		//	LRESULT NotifyHandler(int /*idCtrl*/, LPNMHDR /*pnmh*/, BOOL& /*bHandled*/)
-
-	private:
-		LRESULT OnInitDialog(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/, BOOL& /*bHandled*/);
-		LRESULT OnColorDialog(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/, BOOL& /*bHandled*/);
-		LRESULT OnTimer(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/, BOOL& /*bHandled*/);
-		LRESULT OnTextChanged(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCtl*/, BOOL& /*bHandled*/);
+		void ApplyTextFilter(PCWSTR text) {
+			m_View.SetFilter(text);
+		}
 
 	private:
 		StringsView& m_View;
@@ -55,7 +39,8 @@ private:
 private:
 	DataTarget* _target;
 	CDialogBar* _dialogBar;
-	std::vector<ObjectInfo> _strings, _allStrings;
+	std::vector<ObjectInfo> _allStrings;
+	std::vector<int> _strings;
 	IGenericView* _gv;
 };
 

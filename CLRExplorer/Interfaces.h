@@ -20,6 +20,9 @@ struct IGenericView {
 
 struct IDialogBarProvider {
 	virtual HWND Create(HWND hParent) = 0;
+	virtual bool HandleCommand(UINT cmd) {
+		return false;
+	}
 };
 
 struct IGenericListViewCallback {

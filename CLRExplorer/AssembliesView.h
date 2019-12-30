@@ -2,8 +2,10 @@
 
 #include "Interfaces.h"
 #include "DataTarget.h"
+#include "SortedFilteredVector.h"
+#include "QuickFIlterDialogBar.h"
 
-class AssembliesView : public IGenericListViewCallback {
+class AssembliesView : public IGenericListViewCallback, public IDialogBarProvider {
 public:
 	AssembliesView(DataTarget* dt);
 
@@ -14,10 +16,25 @@ public:
 	bool Sort(int column, bool ascending) override;
 	int GetIcon(int row) override;
 
-	static bool CompareItems(const AssemblyInfo& a1, const AssemblyInfo& a2, int col, bool asc);
+	// IDialogBarProvider
+	HWND Create(HWND hParent) override;
+
+	void SetFilter(PCWSTR text);
+
+private:
+	class CDialogBar : public CQuickFilterDialogBar<CDialogBar> {
+	public:
+		CDialogBar(AssembliesView& view);
+
+		void ApplyTextFilter(PCWSTR text);
+
+	private:
+		AssembliesView& m_View;
+	};
 
 private:
 	DataTarget* _target;
-	std::vector<AssemblyInfo> _items;
+	SortedFilteredVector<AssemblyInfo> _items;
+	IGenericView* _gv;
 };
 

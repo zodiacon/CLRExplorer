@@ -222,6 +222,7 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="ProcessSelectDlg.cpp" />
+    <ClCompile Include="SortedFilteredVector.cpp" />
     <ClCompile Include="SortHelper.cpp" />
     <ClCompile Include="StringsView.cpp" />
     <ClCompile Include="SummaryView.cpp" />
@@ -240,8 +241,10 @@
     <ClInclude Include="MainFrm.h" />
     <ClInclude Include="ObjectsView.h" />
     <ClInclude Include="ProcessSelectDlg.h" />
+    <ClInclude Include="QuickFIlterDialogBar.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="pch.h" />
+    <ClInclude Include="SortedFilteredVector.h" />
     <ClInclude Include="SortHelper.h" />
     <ClInclude Include="StringsView.h" />
     <ClInclude Include="SummaryView.h" />

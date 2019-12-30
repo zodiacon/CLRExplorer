@@ -72,6 +72,9 @@
     <ClCompile Include="StringsView.cpp">
       <Filter>Views</Filter>
     </ClCompile>
+    <ClCompile Include="SortedFilteredVector.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="MainFrm.h">
@@ -130,6 +133,12 @@
     </ClInclude>
     <ClInclude Include="StringsView.h">
       <Filter>Views</Filter>
+    </ClInclude>
+    <ClInclude Include="SortedFilteredVector.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="QuickFIlterDialogBar.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

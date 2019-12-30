@@ -9,18 +9,19 @@ StringsView::StringsView(DataTarget* dt) : _target(dt) {
 
 int StringsView::GetItemCount() {
 	CWaitCursor wait;
+	_allStrings.clear();
 	_strings.clear();
+	_allStrings.reserve(1 << 15);
 	_strings.reserve(1 << 15);
 	_target->EnumObjects([](auto& obj, auto param) {
 		if (obj.ObjectType == OBJ_STRING) {
 			auto p = static_cast<StringsView*>(param);
 			p->GetStringValue(obj);
-			p->_strings.push_back(std::move(obj));
+			p->_strings.push_back(static_cast<int>(p->_strings.size()));
+			p->_allStrings.push_back(std::move(obj));
 		}
 		return true;
 		}, this);
-
-	_allStrings = _strings;
 
 	return static_cast<int>(_strings.size());
 }
@@ -36,7 +37,8 @@ bool StringsView::Init(CListViewCtrl& lv, IGenericView* gv) {
 }
 
 CString StringsView::GetItemText(int row, int col) {
-	auto& str = _strings[row];
+	auto index = _strings[row];
+	auto& str = _allStrings[index];
 
 	switch (col) {
 		case 0: return FormatHelper::ToHex(str.Address);
@@ -48,8 +50,9 @@ CString StringsView::GetItemText(int row, int col) {
 }
 
 bool StringsView::Sort(int column, bool ascending) {
-	std::sort(_strings.begin(), _strings.end(), [=](const auto& str1, const auto& str2) {
-		return CompareItems(str1, str2, column, ascending);
+	std::sort(_strings.begin(), _strings.end(), [=](const auto& i1, const auto& i2) {
+		bool compare = CompareItems(_allStrings[i1], _allStrings[i2], column, ascending);
+		return compare;
 		});
 
 	return true;
@@ -73,45 +76,26 @@ HWND StringsView::Create(HWND hParent) {
 	return _dialogBar->Create(hParent);
 }
 
-void StringsView::ApplyTextFilter(PCWSTR filter) {
+void StringsView::SetFilter(PCWSTR filter) {
 	CString sfilter(filter);
 	if (sfilter.IsEmpty()) {
-		_strings = _allStrings;
+		int i = 0;
+		for (auto& n : _strings)
+			n = i;
 	}
 	else {
 		_strings.clear();
 		CWaitCursor wait;
 		sfilter.MakeUpper();
+		int i = 0;
 		for (auto& str : _allStrings) {
 			auto temp(str.StringValue);
 			temp.MakeUpper();
 			if (temp.Find(sfilter) >= 0)
-				_strings.push_back(str);
+				_strings.push_back(i);
+			i++;
 		}
 	}
 	_gv->SetListViewItemCount(static_cast<int>(_strings.size()));
 }
 
-LRESULT StringsView::CDialogBar::OnInitDialog(UINT, WPARAM, LPARAM, BOOL&) {
-	return LRESULT();
-}
-
-LRESULT StringsView::CDialogBar::OnColorDialog(UINT, WPARAM, LPARAM, BOOL&) {
-	return (LRESULT)::GetSysColorBrush(COLOR_WINDOW);
-}
-
-LRESULT StringsView::CDialogBar::OnTimer(UINT, WPARAM id, LPARAM, BOOL&) {
-	if (id == 100) {
-		KillTimer(100);
-		CString text;
-		GetDlgItemText(IDC_TEXT, text);
-		m_View.ApplyTextFilter(text);
-	}
-	return 0;
-}
-
-LRESULT StringsView::CDialogBar::OnTextChanged(WORD, WORD, HWND, BOOL&) {
-	SetTimer(100, 500, nullptr);
-
-	return 0;
-}

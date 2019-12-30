@@ -64,11 +64,12 @@ LRESULT CGenericView::OnCommand(UINT message, WPARAM wParam, LPARAM lParam, BOOL
 	handled = FALSE;
 	if (m_ToolBarCB)
 		handled = m_ToolBarCB->OnCommand(LOWORD(wParam));
-	LRESULT result = 0;
-	if (!handled) {
-		handled = ProcessWindowMessage(*this, message, wParam, lParam, result, 1);
+	if (!handled && m_DialogBar) {
+		handled = m_DialogBar->HandleCommand(LOWORD(wParam));
+		if (!handled && m_hWndDialogBar)
+			handled = !::SendMessage(m_hWndDialogBar, WM_COMMAND, wParam, lParam);
 	}
-	return result;
+	return 0;
 }
 
 LRESULT CGenericView::OnForwardMessage(UINT, WPARAM, LPARAM lParam, BOOL& handled) {

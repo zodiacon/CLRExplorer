@@ -25,6 +25,7 @@ public:
 		REFLECT_NOTIFICATIONS()
 	ALT_MSG_MAP(1)
 		COMMAND_ID_HANDLER(ID_VIEW_REFRESH, OnRefresh)
+		MESSAGE_HANDLER(WM_COMMAND, OnCommand)
 	END_MSG_MAP()
 
 	// Handler prototypes (uncomment arguments if needed):

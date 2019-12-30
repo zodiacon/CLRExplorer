@@ -33,7 +33,6 @@
 #define IDC_PROCLIST                    1000
 #define IDC_TEXT                        1001
 #define IDC_CLEAR                       1002
-#define IDC_BUTTON2                     1003
 #define ID_WINDOW_CLOSE                 32772
 #define ID_WINDOW_CLOSE_ALL             32773
 #define ID_FILE_ATTACHTOPROCESS         32775
@@ -52,7 +51,7 @@
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        227
-#define _APS_NEXT_COMMAND_VALUE         32785
+#define _APS_NEXT_COMMAND_VALUE         32787
 #define _APS_NEXT_CONTROL_VALUE         1004
 #define _APS_NEXT_SYMED_VALUE           102
 #endif

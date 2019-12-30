@@ -24,7 +24,7 @@ HWND TabFactory::CreateTab(DataTarget* dt, DWORD_PTR type, HWND hParent, int& im
 		case NodeType::AllAssemblies:
 		{
 			auto impl = new AssembliesView(dt);
-			auto view = new CGenericView(impl);
+			auto view = new CGenericView(impl, nullptr, impl);
 			hTab = view->Create(hParent, CRect(), L"All Assemblies", WS_CHILD | WS_VISIBLE | WS_CLIPCHILDREN | WS_CLIPSIBLINGS);
 			image = 2;
 			break;
