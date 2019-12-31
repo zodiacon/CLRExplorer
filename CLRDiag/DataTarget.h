@@ -3,7 +3,8 @@
 #include <atlcomcli.h>
 #include <atlstr.h>
 #include <clrdata.h>
-//#include "CLRDiag.h"
+#include <unordered_map>
+#include <functional>
 #include "dacprivate.h"
 
 struct AppDomainInfo : DacpAppDomainData {
@@ -21,7 +22,6 @@ struct MethodTableInfo : DacpMethodTableData {
 
 struct SyncBlockInfo : DacpSyncBlockData {
 	int Index;
-	CString StringValue;
 };
 
 enum class ThreadType {
@@ -43,7 +43,15 @@ struct ObjectInfo : DacpObjectData {
 	CString StringValue;
 };
 
-using EnumObjectCallback = bool (*)(ObjectInfo& obj, void* userData);
+struct HeapStatItem {
+	CLRDATA_ADDRESS MethodTable;
+	unsigned ObjectCount;
+	long long TotalSize;
+	DacpObjectType Type;
+	CString TypeName;
+};
+
+using EnumObjectCallback = std::function<bool(ObjectInfo& obj, void* userData)>;
 
 class DataTarget abstract {
 public:
@@ -51,6 +59,9 @@ public:
 	static std::unique_ptr<DataTarget> FromDumpFile(PCWSTR dumpFilePath);
 
 	virtual DWORD GetProcessId() const = 0;
+	virtual CString GetProcessPathName() = 0;
+	virtual FILETIME GetProcessStartTime() = 0;
+
 	virtual bool Suspend() {
 		return false;
 	}
@@ -69,10 +80,12 @@ public:
 	std::vector<DacpModuleData> EnumModules();
 	std::vector<SyncBlockInfo> EnumSyncBlocks(bool includeFree);
 	bool EnumObjects(EnumObjectCallback callback, void* userData = nullptr);
+	std::vector<HeapStatItem> GetHeapStats(CLRDATA_ADDRESS address = 0);
 
 	DacpThreadData GetThreadData(CLRDATA_ADDRESS addr);
 	CString GetObjectClassName(CLRDATA_ADDRESS address);
 	CString GetObjectString(CLRDATA_ADDRESS address, unsigned maxLength = 256);
+	DacpMethodTableData GetMethodTableInfo(CLRDATA_ADDRESS mt);
 
 	AppDomainInfo GetSharedDomain();
 	AppDomainInfo GetSystemDomain();
@@ -97,5 +110,6 @@ protected:
 protected:
 	CComPtr<ICLRDataTarget> _clrTarget;
 	CComPtr<IUnknown> _spSos;
+	std::unordered_map<CLRDATA_ADDRESS, MethodTableInfo> _mtCache;
 };
 

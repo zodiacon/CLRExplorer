@@ -8,6 +8,7 @@
 #include "ThreadsView.h"
 #include "StringsView.h"
 #include "ObjectsView.h"
+#include "HeapStatsView.h"
 
 HWND TabFactory::CreateTab(DataTarget* dt, DWORD_PTR type, HWND hParent, int& image) {
 	HWND hTab = nullptr;
@@ -33,9 +34,18 @@ HWND TabFactory::CreateTab(DataTarget* dt, DWORD_PTR type, HWND hParent, int& im
 		case NodeType::SyncBlocks:
 		{
 			auto impl = new SyncBlocksView(dt);
-			auto view = new CGenericView(impl);
+			auto view = new CGenericView(impl, nullptr, impl);
 			hTab = view->Create(hParent, CRect(), L"Sync Blocks", WS_CHILD | WS_VISIBLE | WS_CLIPCHILDREN | WS_CLIPSIBLINGS);
 			image = 7;
+			break;
+		}
+
+		case NodeType::HeapStats:
+		{
+			auto impl = new HeapStatsView(dt);
+			auto view = new CGenericView(impl, nullptr, impl);
+			hTab = view->Create(hParent, CRect(), L"Heap Stats", WS_CHILD | WS_VISIBLE | WS_CLIPCHILDREN | WS_CLIPSIBLINGS);
+			image = 10;
 			break;
 		}
 

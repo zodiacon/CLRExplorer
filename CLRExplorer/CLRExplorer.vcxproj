@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
@@ -213,6 +213,7 @@
     <ClCompile Include="CLRExplorer.cpp" />
     <ClCompile Include="FormatHelper.cpp" />
     <ClCompile Include="GenericListView.cpp" />
+    <ClCompile Include="HeapStatsView.cpp" />
     <ClCompile Include="MainFrm.cpp" />
     <ClCompile Include="ObjectsView.cpp" />
     <ClCompile Include="pch.cpp">
@@ -222,7 +223,6 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="ProcessSelectDlg.cpp" />
-    <ClCompile Include="SortedFilteredVector.cpp" />
     <ClCompile Include="SortHelper.cpp" />
     <ClCompile Include="StringsView.cpp" />
     <ClCompile Include="SummaryView.cpp" />
@@ -237,6 +237,7 @@
     <ClInclude Include="AssembliesView.h" />
     <ClInclude Include="FormatHelper.h" />
     <ClInclude Include="GenericListView.h" />
+    <ClInclude Include="HeapStatsView.h" />
     <ClInclude Include="Interfaces.h" />
     <ClInclude Include="MainFrm.h" />
     <ClInclude Include="ObjectsView.h" />
@@ -269,9 +270,13 @@
     <Image Include="res\close-all.ico" />
     <Image Include="res\close.ico" />
     <Image Include="res\CLRExplorer.ico" />
+    <Image Include="res\free.ico" />
+    <Image Include="res\grid.ico" />
     <Image Include="res\library.ico" />
     <Image Include="res\memory-filled.ico" />
+    <Image Include="res\memory-stats-filled.ico" />
     <Image Include="res\module-filled.ico" />
+    <Image Include="res\object-filled.ico" />
     <Image Include="res\open-filled.ico" />
     <Image Include="res\package-filled.ico" />
     <Image Include="res\padlock-filled.ico" />

@@ -4,10 +4,14 @@
 #include "DataTarget.h"
 #include "SortedFilteredVector.h"
 #include "QuickFIlterDialogBar.h"
+#include "resource.h"
 
-class AssembliesView : public IGenericListViewCallback, public IDialogBarProvider {
+class HeapStatsView : 
+	public IGenericListViewCallback, public IDialogBarProvider {
 public:
-	AssembliesView(DataTarget* dt);
+	HeapStatsView(DataTarget* dt);
+
+	void SetFilter(PCWSTR text);
 
 	// IGenericListViewCallback
 	int GetItemCount() override;
@@ -19,22 +23,20 @@ public:
 	// IDialogBarProvider
 	HWND Create(HWND hParent) override;
 
-	void SetFilter(PCWSTR text);
-
 private:
 	class CDialogBar : public CQuickFilterDialogBar<CDialogBar> {
 	public:
-		CDialogBar(AssembliesView& view);
+		CDialogBar(HeapStatsView& view) : BaseClass(IDD_STRINGS_DIALOGBAR), m_View(view) {}
 
-		void ApplyTextFilter(PCWSTR text);
-
-	private:
-		AssembliesView& m_View;
+		void ApplyTextFilter(PCWSTR text) {
+			m_View.SetFilter(text);
+		}
+		HeapStatsView& m_View;
 	};
 
 private:
 	DataTarget* _target;
-	SortedFilteredVector<AssemblyInfo> _items;
-	IGenericListView* _gv;
+	SortedFilteredVector<HeapStatItem> _items;
+	IGenericListView* _glv;
 };
 

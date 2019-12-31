@@ -269,11 +269,7 @@ struct MSLAYOUT DacpModuleData : ZeroInit<DacpModuleData>
     CLRDATA_ADDRESS pThunkHeap;
 
     ULONG64 dwModuleIndex;
-
-    DacpModuleData()
-    {
-    }
-    
+  
     HRESULT Request(ISOSDacInterface *sos, CLRDATA_ADDRESS addr)
     {
         return sos->GetModuleData(addr, this);

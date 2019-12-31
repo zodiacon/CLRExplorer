@@ -12,8 +12,9 @@ public:
 		MESSAGE_HANDLER(WM_TIMER, OnTimer)
 		MESSAGE_HANDLER(WM_CTLCOLORDLG, OnColorDialog)
 		MESSAGE_HANDLER(WM_CTLCOLORSTATIC, OnColorDialog)
+		MESSAGE_HANDLER(WM_CTLCOLORBTN, OnColorDialog)
 		COMMAND_HANDLER(IDC_TEXT, EN_CHANGE, OnTextChanged)
-		COMMAND_HANDLER(IDC_CLEAR, BN_CLICKED, OnClearText)
+		COMMAND_ID_HANDLER(IDCANCEL, OnClearText)
 		COMMAND_ID_HANDLER(ID_EDIT_FIND, OnFind)
 	ALT_MSG_MAP(1)
 		MESSAGE_HANDLER(WM_KEYDOWN, OnEditKeyDown)
@@ -22,6 +23,10 @@ public:
 	int IDD;		// dialog ID
 
 	CQuickFilterDialogBar(UINT idd) : IDD(idd), m_Edit(this, 1) {
+	}
+
+	void ApplyTextFilter() {
+		ATLTRACE(L"Unimplemented ApplyTextFilter\n");
 	}
 
 	// Handler prototypes (uncomment arguments if needed):
@@ -36,11 +41,13 @@ private:
 			bHandled = TRUE;
 			return 0;
 		}
-		return DefWindowProc();
+		bHandled = FALSE;
+		return 0;
 	}
 
 	LRESULT OnInitDialog(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/, BOOL& /*bHandled*/) {
 		m_Edit.SubclassWindow(GetDlgItem(IDC_TEXT));
+		CButton(GetDlgItem(IDCANCEL)).SetIcon(AtlLoadIconImage(IDI_CLOSE, 0, 16, 16));
 
 		return TRUE;
 	}
@@ -64,8 +71,9 @@ private:
 		return 0;
 	}
 
-	LRESULT OnClearText(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCtl*/, BOOL& /*bHandled*/) {
+	LRESULT OnClearText(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCtl*/, BOOL& bHandled) {
 		SetDlgItemText(IDC_TEXT, L"");
+		bHandled = TRUE;
 		return 0;
 	}
 
@@ -75,5 +83,5 @@ private:
 	}
 
 protected:
-	CContainedWindow m_Edit;
+	CContainedWindowT<CEdit> m_Edit;
 };

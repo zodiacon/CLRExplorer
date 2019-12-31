@@ -11,7 +11,7 @@
 #include "ProcessSelectDlg.h"
 #include "TabFactory.h"
 
-const int WINDOW_MENU_POSITION = 4;
+const int WINDOW_MENU_POSITION = 5;
 
 CMainFrame::CMainFrame() : m_TreeMgr(m_TreeView, this) {
 }
@@ -73,6 +73,9 @@ LRESULT CMainFrame::OnCreate(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/
 
 	CMenuHandle menuMain = m_CmdBar.GetMenu();
 	m_view.SetWindowMenu(menuMain.GetSubMenu(WINDOW_MENU_POSITION));
+	m_view.m_cyTabHeight = 24;
+
+	UpdateUI();
 
 	return 0;
 }
@@ -118,12 +121,30 @@ LRESULT CMainFrame::OnAppAbout(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCt
 	return 0;
 }
 
+LRESULT CMainFrame::OnFileOpen(WORD, WORD, HWND, BOOL&) {
+	CSimpleFileDialog dlg(TRUE, L".dmp", nullptr, OFN_EXPLORER | OFN_FILEMUSTEXIST | OFN_ENABLESIZING,
+		L"Dump Files (*.dmp)\0*.dmp\0All Files\0*.*\0", *this);
+	if (dlg.DoModal() == IDOK) {
+		auto dt = DataTarget::FromDumpFile(dlg.m_szFileName);
+		if (dt == nullptr) {
+			AtlMessageBox(*this, L"Failed to open dump file", IDS_TITLE);
+			return 0;
+		}
+		m_DataTarget = std::move(dt);
+		m_view.RemoveAllPages();
+		m_TreeMgr.Init(m_DataTarget.get(), dlg.m_szFileTitle);
+		UpdateUI();
+	}
+	return 0;
+}
+
 LRESULT CMainFrame::OnWindowClose(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCtl*/, BOOL& /*bHandled*/) {
 	int nActivePage = m_view.GetActivePage();
 	if (nActivePage != -1)
 		m_view.RemovePage(nActivePage);
 	else
 		::MessageBeep((UINT)-1);
+	UIEnable(ID_WINDOW_CLOSE, m_view.GetPageCount() > 0);
 
 	return 0;
 }
@@ -154,6 +175,7 @@ LRESULT CMainFrame::OnAttachToProcess(WORD, WORD, HWND, BOOL&) {
 		m_DataTarget = std::move(dt);
 		m_view.RemoveAllPages();
 		m_TreeMgr.Init(m_DataTarget.get(), name);
+		UpdateUI();
 	}
 	return 0;
 }
@@ -202,7 +224,9 @@ void CMainFrame::InitCommandBar() {
 		{ ID_WINDOW_CLOSE_ALL, IDI_CLOSEALL },
 		{ ID_TARGET_GCHEAPS, IDI_MEMORY },
 		{ ID_TARGET_SYNCBLOCKS, IDI_SYNCBLK },
+		{ ID_TARGET_ALLSTRINGS, IDI_STRING },
 		{ ID_VIEW_REFRESH, IDI_REFRESH },
+		{ ID_TARGET_HEAPSTATS, IDI_HEAP_STATS },
 	};
 	for (auto& cmd : cmds)
 		m_CmdBar.AddIcon(AtlLoadIcon(cmd.icon), cmd.id);
@@ -225,10 +249,11 @@ void CMainFrame::InitToolBar(CToolBarCtrl& tb) {
 		{ ID_TARGET_APPDOMAINS, IDI_PACKAGE },
 		{ ID_TARGET_ALLASSEMBLIES, IDI_ASSEMBLY },
 		{ ID_TARGET_ALLMODULES, IDI_MODULE },
-		{ ID_TARGET_GCHEAPS, IDI_MEMORY },
+		{ ID_TARGET_HEAPSTATS, IDI_HEAP_STATS},
 		{ ID_TARGET_SYNCBLOCKS, IDI_SYNCBLK },
 		{ ID_TARGET_THREADS, IDI_THREAD },
 		{ ID_TARGET_THREADPOOL, IDI_THREADPOOL },
+		{ ID_TARGET_ALLSTRINGS, IDI_STRING },
 		{ 0 },
 		{ ID_WINDOW_CLOSE, IDI_CLOSE },
 	};
@@ -241,6 +266,12 @@ void CMainFrame::InitToolBar(CToolBarCtrl& tb) {
 		}
 	}
 
+}
+
+void CMainFrame::UpdateUI() {
+	for (int i = ID_TARGET_SUMMARY; i <= ID_TARGET_HEAPSTATS; i++)
+		UIEnable(i, m_DataTarget != nullptr);
+	UIEnable(ID_WINDOW_CLOSE, m_view.GetPageCount() > 0);
 }
 
 int CMainFrame::FindTab(DWORD_PTR data) {

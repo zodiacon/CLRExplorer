@@ -16,5 +16,6 @@
 #include <vector>
 #include <memory>
 #include <TlHelp32.h>
+#include <DbgEng.h>
 
 #endif //PCH_H

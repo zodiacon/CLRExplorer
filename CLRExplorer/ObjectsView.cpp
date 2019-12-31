@@ -1,14 +1,15 @@
 #include "pch.h"
 #include "ObjectsView.h"
 
-ObjectsView::ObjectsView(DataTarget* dt) : _target(dt) {
+ObjectsView::ObjectsView(DataTarget* dt, const MethodTableInfo& mt) : _target(dt), _mt(mt) {
 }
 
 int ObjectsView::GetItemCount() {
+
 	return 0;
 }
 
-bool ObjectsView::Init(CListViewCtrl& lv, IGenericView* glv) {
+bool ObjectsView::Init(CListViewCtrl& lv, IGenericListView* glv) {
 	return false;
 }
 

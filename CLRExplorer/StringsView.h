@@ -11,7 +11,7 @@ public:
 
 	// IGenericListViewCallback
 	int GetItemCount() override;
-	bool Init(CListViewCtrl& lv, IGenericView* glv) override;
+	bool Init(CListViewCtrl& lv, IGenericListView* glv) override;
 	CString GetItemText(int row, int col) override;
 	bool Sort(int column, bool ascending) override;
 
@@ -41,6 +41,6 @@ private:
 	CDialogBar* _dialogBar;
 	std::vector<ObjectInfo> _allStrings;
 	std::vector<int> _strings;
-	IGenericView* _gv;
+	IGenericListView* _gv;
 };
 

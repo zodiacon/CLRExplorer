@@ -72,8 +72,8 @@
     <ClCompile Include="StringsView.cpp">
       <Filter>Views</Filter>
     </ClCompile>
-    <ClCompile Include="SortedFilteredVector.cpp">
-      <Filter>Source Files</Filter>
+    <ClCompile Include="HeapStatsView.cpp">
+      <Filter>Views</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -139,6 +139,9 @@
     </ClInclude>
     <ClInclude Include="QuickFIlterDialogBar.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="HeapStatsView.h">
+      <Filter>Views</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -217,6 +220,18 @@
       <Filter>Resource Files\Icons</Filter>
     </Image>
     <Image Include="res\string.ico">
+      <Filter>Resource Files\Icons</Filter>
+    </Image>
+    <Image Include="res\free.ico">
+      <Filter>Resource Files\Icons</Filter>
+    </Image>
+    <Image Include="res\grid.ico">
+      <Filter>Resource Files\Icons</Filter>
+    </Image>
+    <Image Include="res\memory-stats-filled.ico">
+      <Filter>Resource Files\Icons</Filter>
+    </Image>
+    <Image Include="res\object-filled.ico">
       <Filter>Resource Files\Icons</Filter>
     </Image>
   </ItemGroup>

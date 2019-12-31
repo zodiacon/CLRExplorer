@@ -10,6 +10,8 @@ public:
 	DWORD GetProcessId() const override;
 	bool Suspend() override;
 	bool Resume() override;
+	CString GetProcessPathName() override;
+	FILETIME GetProcessStartTime() override;
 
 protected:
 	HRESULT Init() override;

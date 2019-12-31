@@ -2,6 +2,8 @@
 #include "ThreadsView.h"
 #include "resource.h"
 #include "FormatHelper.h"
+#include <algorithm>
+#include "SortHelper.h"
 
 ThreadsView::ThreadsView(DataTarget* dt) : _target(dt) {
 }
@@ -11,14 +13,14 @@ int ThreadsView::GetItemCount() {
 	return static_cast<int>(_threads.size());
 }
 
-bool ThreadsView::Init(CListViewCtrl& lv, IGenericView* glv) {
+bool ThreadsView::Init(CListViewCtrl& lv, IGenericListView* glv) {
 	_glv = glv;
 
 	lv.InsertColumn(0, L"Managed ID", LVCFMT_CENTER, 80);
 	lv.InsertColumn(1, L"OS ID", LVCFMT_RIGHT, 120);
 	lv.InsertColumn(2, L"State", LVCFMT_RIGHT, 90);
 	lv.InsertColumn(3, L"Locks", LVCFMT_CENTER, 70);
-	lv.InsertColumn(4, L"TEB", LVCFMT_RIGHT, 120);
+	lv.InsertColumn(4, L"TEB", LVCFMT_RIGHT, 140);
 	lv.InsertColumn(5, L"Details", LVCFMT_LEFT, 450);
 
 	CImageList images;
@@ -35,7 +37,7 @@ CString ThreadsView::GetItemText(int row, int col) {
 
 	switch (col) {
 		case 0: return FormatHelper::ToDec(data.corThreadId, 4);
-		case 1: return FormatHelper::ToDec(data.osThreadId) + L" (" + FormatHelper::ToHex(data.osThreadId) + L")";
+		case 1: return data.osThreadId == 0 ? L"" : FormatHelper::ToDec(data.osThreadId) + L" (" + FormatHelper::ToHex(data.osThreadId) + L")";
 		case 2: return FormatHelper::ToHex(data.state);
 		case 3: return FormatHelper::ToDec(data.lockCount);
 		case 4: return FormatHelper::ToHex((PVOID)data.teb);
@@ -46,7 +48,11 @@ CString ThreadsView::GetItemText(int row, int col) {
 }
 
 bool ThreadsView::Sort(int column, bool ascending) {
-	return false;
+	std::sort(_threads.begin(), _threads.end(), [=](auto& t1, auto& t2) {
+		return CompareItems(t1, t2, column, ascending);
+		});
+
+	return true;
 }
 
 int ThreadsView::GetIcon(int row) {
@@ -64,6 +70,7 @@ bool ThreadsView::Init(CToolBarCtrl& tb) {
 		int style = BTNS_BUTTON;
 	} buttons[] = {
 		{ IdShowDeadThreads, IDI_THREAD_DEAD, BTNS_CHECK },
+		{ IdShowNativeThreads, IDI_THREAD_NATIVE, BTNS_CHECK },
 	};
 	for (auto& b : buttons) {
 		if (b.id == 0)
@@ -132,4 +139,18 @@ CString ThreadsView::ThreadStateToString(DWORD state) {
 	if (!text.IsEmpty())
 		text = text.Left(text.GetLength() - 2);
 	return text;
+}
+
+bool ThreadsView::CompareItems(const ThreadInfo& t1, const ThreadInfo& t2, int col, bool asc) {
+	switch (col) {
+		case 0: return SortHelper::SortNumbers(t1.corThreadId, t2.corThreadId, asc);
+		case 1: return SortHelper::SortNumbers(t1.osThreadId, t2.osThreadId, asc);
+		case 2: case 5:
+			return SortHelper::SortNumbers(t1.state, t2.state, asc);
+		case 3: return SortHelper::SortNumbers(t1.lockCount, t2.lockCount, asc);
+		case 4: return SortHelper::SortNumbers(t1.teb, t2.teb, asc);
+
+	}
+	ATLASSERT(false);
+	return false;
 }

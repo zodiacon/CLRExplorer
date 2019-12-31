@@ -1,17 +1,16 @@
 #pragma once
 
-class DataTarget;
+#include <DbgHelp.h>
 
-class CCLRDataTarget : 
+class CDumpCLRDataTarget :
 	public CComObjectRootEx<CComMultiThreadModel>,
-	public ICLRDataTarget {
+	public ICLRDataTarget{
 public:
-	BEGIN_COM_MAP(CCLRDataTarget)
+	BEGIN_COM_MAP(CDumpCLRDataTarget)
 		COM_INTERFACE_ENTRY(ICLRDataTarget)
 	END_COM_MAP()
 
-	HRESULT Init(DataTarget* dt);
-	void FinalRelease();
+	HRESULT Init(PCWSTR dumpFilePath);
 
 	// ICLRDataTarget
 	HRESULT __stdcall GetMachineType(ULONG32* machineType) override;
@@ -26,8 +25,22 @@ public:
 	HRESULT __stdcall SetThreadContext(ULONG32 threadID, ULONG32 contextSize, BYTE* context) override;
 	HRESULT __stdcall Request(ULONG32 reqCode, ULONG32 inBufferSize, BYTE* inBuffer, ULONG32 outBufferSize, BYTE* outBuffer) override;
 
+	CString ReadString(DWORD rva);
+	bool FindModule(PCWSTR name, CString& path, MINIDUMP_MODULE* pModule = nullptr);
+	DWORD GetProcessId() const;
+	CString GetProcessImagePath() const;
+	FILETIME GetProcessCreateTime() const;
+
 private:
-	DataTarget* m_Target;
-	HANDLE m_hProcess{ nullptr };
+	bool GetMiscInfo() const;
+
+private:
+	CComPtr<IDebugClient6> m_spDebug;
+	CComQIPtr<IDebugControl5> m_spControl;
+	CComQIPtr<IDebugAdvanced3> m_spAdvanced;
+	CComQIPtr<IDebugDataSpaces3> m_spDataSpaces;
+	CComQIPtr<IDebugSystemObjects4> m_spSysObjects;
+	mutable std::unique_ptr<MINIDUMP_MISC_INFO> m_MiscInfo;
+	HANDLE m_hFile;
 };
 

@@ -13,12 +13,11 @@ int StringsView::GetItemCount() {
 	_strings.clear();
 	_allStrings.reserve(1 << 15);
 	_strings.reserve(1 << 15);
-	_target->EnumObjects([](auto& obj, auto param) {
+	_target->EnumObjects([&](auto& obj, auto param) {
 		if (obj.ObjectType == OBJ_STRING) {
-			auto p = static_cast<StringsView*>(param);
-			p->GetStringValue(obj);
-			p->_strings.push_back(static_cast<int>(p->_strings.size()));
-			p->_allStrings.push_back(std::move(obj));
+			GetStringValue(obj);
+			_strings.push_back(static_cast<int>(_strings.size()));
+			_allStrings.push_back(std::move(obj));
 		}
 		return true;
 		}, this);
@@ -26,7 +25,7 @@ int StringsView::GetItemCount() {
 	return static_cast<int>(_strings.size());
 }
 
-bool StringsView::Init(CListViewCtrl& lv, IGenericView* gv) {
+bool StringsView::Init(CListViewCtrl& lv, IGenericListView* gv) {
 	lv.InsertColumn(0, L"Address", LVCFMT_LEFT, 120);
 	lv.InsertColumn(1, L"Length", LVCFMT_RIGHT, 80);
 	lv.InsertColumn(2, L"Value", LVCFMT_LEFT, 500);
@@ -51,8 +50,7 @@ CString StringsView::GetItemText(int row, int col) {
 
 bool StringsView::Sort(int column, bool ascending) {
 	std::sort(_strings.begin(), _strings.end(), [=](const auto& i1, const auto& i2) {
-		bool compare = CompareItems(_allStrings[i1], _allStrings[i2], column, ascending);
-		return compare;
+		return CompareItems(_allStrings[i1], _allStrings[i2], column, ascending);
 		});
 
 	return true;

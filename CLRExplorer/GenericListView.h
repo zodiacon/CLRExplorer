@@ -6,7 +6,7 @@
 class CGenericListView :
 	public CVirtualListView<CGenericListView>,
 	public CWindowImpl<CGenericListView, CListViewCtrl>,
-	public IGenericView {
+	public IGenericListView {
 public:
 	DECLARE_WND_SUPERCLASS(nullptr, CListViewCtrl::GetWndClassName())
 

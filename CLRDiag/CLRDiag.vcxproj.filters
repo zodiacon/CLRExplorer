@@ -24,9 +24,6 @@
     <ClInclude Include="LiveProcessDataTarget.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="LiveDataTarget.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="xclrdata.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -37,6 +34,15 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="dacprivate.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="LiveCLRDataTarget.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="DumpCLRDataTarget.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="DumpFileDataTarget.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -50,10 +56,16 @@
     <ClCompile Include="DataTarget.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="CLRDataTarget.cpp">
+    <ClCompile Include="LiveProcessDataTarget.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="LiveProcessDataTarget.cpp">
+    <ClCompile Include="LiveCLRDataTarget.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="DumpCLRDataTarget.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="DumpFileDataTarget.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

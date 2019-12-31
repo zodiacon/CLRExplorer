@@ -2,7 +2,7 @@
 #include "LiveProcessDataTarget.h"
 #include <metahost.h>
 #include <string>
-#include "LiveDataTarget.h"
+#include "LiveCLRDataTarget.h"
 #include "DataTarget.h"
 #include <winternl.h>
 
@@ -40,6 +40,31 @@ bool LiveProcessDataTarget::Resume() {
 	return NT_SUCCESS(status);
 }
 
+CString LiveProcessDataTarget::GetProcessPathName() {
+	auto hProcess = ::OpenProcess(PROCESS_QUERY_LIMITED_INFORMATION, FALSE, _pid);
+	if (!hProcess)
+		return L"";
+
+	WCHAR path[MAX_PATH * 2];
+	path[0] = L'\0';
+	DWORD len = _countof(path);
+	::QueryFullProcessImageName(hProcess, 0, path, &len);
+	::CloseHandle(hProcess);
+	return path;
+}
+
+FILETIME LiveProcessDataTarget::GetProcessStartTime() {
+	FILETIME create = { 0 }, dummy;
+	auto hProcess = ::OpenProcess(PROCESS_QUERY_LIMITED_INFORMATION, FALSE, _pid);
+	if (!hProcess)
+		return create;
+
+	auto ok = ::GetProcessTimes(hProcess, &create, &dummy, &dummy, &dummy);
+	::CloseHandle(hProcess);
+
+	return create;
+}
+
 HRESULT LiveProcessDataTarget::Init() {
 	CString path, dacFile;
 	if (FindModule(L"clr.dll", path))
@@ -57,9 +82,9 @@ HRESULT LiveProcessDataTarget::Init() {
 	if(!pCLRCreateData)
 		return HRESULT_FROM_WIN32(::GetLastError());
 
-	CComObject<CCLRDataTarget>* target;
+	CComObject<CLiveCLRDataTarget>* target;
 	target->CreateInstance(&target);
-	auto hr = target->Init(this);
+	auto hr = target->Init(_pid);
 	if (FAILED(hr))
 		return hr;
 	_clrTarget = target;

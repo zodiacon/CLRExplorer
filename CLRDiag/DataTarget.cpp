@@ -1,12 +1,10 @@
 #include "pch.h"
 #include "DataTarget.h"
 #include "LiveProcessDataTarget.h"
+#include "DumpFileDataTarget.h"
 #include "dacprivate.h"
 
-//CComModule _Module;
-
-
-inline static size_t Align(size_t nbytes) {
+inline static size_t Align(ULONG64 nbytes) {
 #ifdef _WIN64
 	return (nbytes + 7) & ~7;
 #else
@@ -16,6 +14,11 @@ inline static size_t Align(size_t nbytes) {
 
 std::unique_ptr<DataTarget> DataTarget::FromProcessId(DWORD pid) {
 	std::unique_ptr<DataTarget> target = std::make_unique<LiveProcessDataTarget>(pid);
+	return target->Init() == S_OK ? std::move(target) : nullptr;
+}
+
+std::unique_ptr<DataTarget> DataTarget::FromDumpFile(PCWSTR dumpFilePath) {
+	std::unique_ptr<DataTarget>  target = std::make_unique<DumpFileDataTarget>(dumpFilePath);
 	return target->Init() == S_OK ? std::move(target) : nullptr;
 }
 
@@ -140,7 +143,7 @@ std::vector<SyncBlockInfo> DataTarget::EnumSyncBlocks(bool includeFree) {
 		sbs.push_back(data);
 	}
 	auto count = data.SyncBlockCount;
-	for (UINT i = 1; i <= count; i++) {
+	for (UINT i = 2; i <= count; i++) {
 		spSos->GetSyncBlockData(i, &data);
 		if (includeFree || !data.bFree) {
 			data.Index = i;
@@ -442,4 +445,50 @@ CString DataTarget::GetObjectString(CLRDATA_ADDRESS address, unsigned maxLength)
 	unsigned len;
 	auto hr = spSos->GetObjectStringData(address, maxLength, buffer.get(), &len);
 	return FAILED(hr) ? L"" : buffer.get();
+}
+
+DacpMethodTableData DataTarget::GetMethodTableInfo(CLRDATA_ADDRESS mt) {
+	CComQIPtr<ISOSDacInterface> spSos(_spSos);
+	DacpMethodTableData info;
+	spSos->GetMethodTableData(mt, &info);
+	return info;
+}
+
+std::vector<HeapStatItem> DataTarget::GetHeapStats(CLRDATA_ADDRESS address) {
+	std::unordered_map<CLRDATA_ADDRESS, HeapStatItem> items;
+	items.reserve(1024);
+
+	WCHAR name[512];
+	HRESULT hr;
+	unsigned len;
+	CComQIPtr<ISOSDacInterface> spSos(_spSos);
+	EnumObjects([&](ObjectInfo& obj, auto) {
+		auto it = items.find(obj.MethodTable);
+		if (it == items.end()) {
+			HeapStatItem info;
+			info.MethodTable = obj.MethodTable;
+			info.ObjectCount = 1;
+			info.TotalSize = obj.Size;
+			info.Type = obj.ObjectType;
+			if (obj.ObjectType != OBJ_FREE) {
+				hr = spSos->GetObjectClassName(obj.Address, _countof(name), name, &len);
+				if (hr == S_OK)
+					info.TypeName = name;
+			}
+			else
+				info.TypeName = L"*Free*";
+			items.insert({ info.MethodTable, info });
+		}
+		else {
+			it->second.TotalSize += obj.Size;
+			it->second.ObjectCount++;
+		}
+		return true;
+		});
+	std::vector<HeapStatItem> hitems;
+	hitems.reserve(items.size());
+	for (auto& [addr, mt] : items)
+		hitems.push_back(mt);
+
+	return hitems;
 }

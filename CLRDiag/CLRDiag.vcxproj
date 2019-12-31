@@ -155,9 +155,11 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="DumpCLRDataTarget.h" />
     <ClInclude Include="clrdata.h" />
     <ClInclude Include="dacprivate.h" />
-    <ClInclude Include="LiveDataTarget.h" />
+    <ClInclude Include="DumpFileDataTarget.h" />
+    <ClInclude Include="LiveCLRDataTarget.h" />
     <ClInclude Include="DataTarget.h" />
     <ClInclude Include="LiveProcessDataTarget.h" />
     <ClInclude Include="pch.h" />
@@ -165,7 +167,9 @@
     <ClInclude Include="xclrdata.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="CLRDataTarget.cpp" />
+    <ClCompile Include="DumpCLRDataTarget.cpp" />
+    <ClCompile Include="DumpFileDataTarget.cpp" />
+    <ClCompile Include="LiveCLRDataTarget.cpp" />
     <ClCompile Include="CLRDiag.cpp" />
     <ClCompile Include="DataTarget.cpp" />
     <ClCompile Include="LiveProcessDataTarget.cpp" />

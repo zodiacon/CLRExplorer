@@ -54,7 +54,8 @@ int main(int argc, const char* argv[]) {
 
 	::CoInitialize(nullptr);
 
-	auto dt = DataTarget::FromProcessId(atoi(argv[1]));
+	//auto dt = DataTarget::FromProcessId(atoi(argv[1]));
+	auto dt = DataTarget::FromDumpFile(L"c:\\temp\\HlpViewer.exe_191231_122702.dmp");
 	if (dt == nullptr) {
 		printf("Error connecting to target\n");
 		return 1;
@@ -64,7 +65,7 @@ int main(int argc, const char* argv[]) {
 	if(!suspended)
 		printf("Failed to suspend process\n");
 
-	DumpObjects(dt.get());
+	//DumpObjects(dt.get());
 	//DumpAppDomainsAndAssemblies(dt.get());
 	//DumpThreadPool(dt.get());
 	//DumpThreads(dt.get());

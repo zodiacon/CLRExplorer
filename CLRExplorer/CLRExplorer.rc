@@ -76,9 +76,15 @@ BEGIN
         MENUITEM "All A&ssemblies",             ID_TARGET_ALLASSEMBLIES
         MENUITEM "All &Modules",                ID_TARGET_ALLMODULES
         MENUITEM "&GC Heaps",                   ID_TARGET_GCHEAPS
+        MENUITEM "&Heap Stats",                 ID_TARGET_HEAPSTATS
         MENUITEM "Th&reads",                    ID_TARGET_THREADS
         MENUITEM "Sync &Blocks",                ID_TARGET_SYNCBLOCKS
         MENUITEM "&Thread Pool",                ID_TARGET_THREADPOOL
+        MENUITEM "All Strin&gs",                ID_TARGET_ALLSTRINGS
+    END
+    POPUP "&Options"
+    BEGIN
+        MENUITEM "&Always On Top",              ID_OPTIONS_ALWAYSONTOP
     END
     POPUP "&Window"
     BEGIN
@@ -147,6 +153,14 @@ IDI_COPY                ICON                    "res\\clipboard-copy.ico"
 
 IDI_STRING              ICON                    "res\\string.ico"
 
+IDI_HEAP_STATS          ICON                    "res\\memory-stats-filled.ico"
+
+IDI_GRID                ICON                    "res\\grid.ico"
+
+IDI_OBJECT              ICON                    "res\\object-filled.ico"
+
+IDI_FREE                ICON                    "res\\free.ico"
+
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -173,13 +187,14 @@ BEGIN
     CONTROL         "",IDC_PROCLIST,"SysListView32",LVS_REPORT | LVS_SINGLESEL | LVS_SHOWSELALWAYS | LVS_ALIGNLEFT | LVS_OWNERDATA | WS_BORDER | WS_TABSTOP,7,7,373,229
 END
 
-IDD_STRINGS_DIALOGBAR DIALOGEX 0, 0, 330, 16
-STYLE DS_SETFONT | DS_FIXEDSYS | WS_CHILD
+IDD_STRINGS_DIALOGBAR DIALOGEX 0, 0, 331, 20
+STYLE DS_SETFONT | DS_FIXEDSYS | DS_CONTROL | WS_CHILD | WS_CLIPCHILDREN
+EXSTYLE WS_EX_CLIENTEDGE
 FONT 8, "MS Shell Dlg", 400, 0, 0x0
 BEGIN
-    LTEXT           "Quick Find:",IDC_STATIC,7,4,36,8
-    EDITTEXT        IDC_TEXT,51,2,118,14,ES_AUTOHSCROLL
-    PUSHBUTTON      "Clear",IDC_CLEAR,175,2,33,14
+    LTEXT           "Quick Find:",IDC_STATIC,6,4,36,8
+    EDITTEXT        IDC_TEXT,46,1,123,14,ES_AUTOHSCROLL
+    PUSHBUTTON      "Clear",IDCANCEL,175,1,16,14,BS_ICON | BS_FLAT
 END
 
 
@@ -207,9 +222,9 @@ BEGIN
     IDD_STRINGS_DIALOGBAR, DIALOG
     BEGIN
         LEFTMARGIN, 6
-        RIGHTMARGIN, 323
+        RIGHTMARGIN, 324
         TOPMARGIN, 7
-        BOTTOMMARGIN, 9
+        BOTTOMMARGIN, 13
     END
 END
 #endif    // APSTUDIO_INVOKED

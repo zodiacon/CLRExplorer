@@ -10,10 +10,11 @@ enum class NodeType : size_t {
 	Threads,
 	GCHeaps,
 	SyncBlocks,
-	AllStrings
+	AllStrings,
+	HeapStats
 };
 
-struct IGenericView {
+struct IGenericListView {
 	virtual void Refresh() = 0;
 	virtual void SetListViewItemCount(int count) = 0;
 };
@@ -27,7 +28,7 @@ struct IDialogBarProvider {
 
 struct IGenericListViewCallback {
 	virtual int GetItemCount() = 0;
-	virtual bool Init(CListViewCtrl& lv, IGenericView* glv) = 0;
+	virtual bool Init(CListViewCtrl& lv, IGenericListView* glv) = 0;
 	virtual CString GetItemText(int row, int col) = 0;
 	virtual int GetIcon(int row) {
 		return -1;
