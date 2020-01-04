@@ -126,3 +126,10 @@ LRESULT CGenericListView::OnEditCopy(WORD, WORD, HWND, BOOL&) {
 	return 0;
 }
 
+LRESULT CGenericListView::OnDoubleClick(int, LPNMHDR, BOOL&) {
+	auto selected = GetNextItem(-1, LVNI_SELECTED);
+	m_Callback->OnDoubleClick(selected);
+
+	return LRESULT();
+}
+

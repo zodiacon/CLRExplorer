@@ -4,7 +4,7 @@
 #include "SortHelper.h"
 #include "resource.h"
 
-HeapStatsView::HeapStatsView(DataTarget* dt) :_target(dt) {
+HeapStatsView::HeapStatsView(DataTarget* dt, IMainFrame* frame) :_target(dt), _frame(frame) {
 }
 
 int HeapStatsView::GetItemCount() {
@@ -64,9 +64,38 @@ int HeapStatsView::GetIcon(int row) {
 	return (int)item.Type;
 }
 
+void HeapStatsView::OnContextMenu(const POINT& pt, int selected) {
+	if (selected < 0)
+		return;
+
+	CMenu menu;
+	menu.LoadMenuW(IDR_CONTEXT);
+	auto cmd = (UINT)_frame->ShowContextMenu(menu.GetSubMenu(0), pt, TPM_RETURNCMD);
+	auto& item = _items[selected];
+
+	switch (cmd) {
+		case ID_HEAPSTATS_SHOWALLINSTANCES:
+			ShowAllInstances(selected);
+			break;
+	}
+}
+
+void HeapStatsView::OnDoubleClick(int selected) {
+	if (selected >= 0)
+		ShowAllInstances(selected);
+}
+
 HWND HeapStatsView::Create(HWND hParent) {
 	auto dlg = new CDialogBar(*this);
 	return dlg->Create(hParent);
+}
+
+void HeapStatsView::ShowAllInstances(int selected) {
+	auto& item = _items[selected];
+	int tab = _frame->FindTab(item.MethodTable);
+	if (tab < 0) {
+		_frame->AddTab(item.MethodTable, NodeType::MethodTable, NodeType::HeapStats);
+	}
 }
 
 void HeapStatsView::SetFilter(PCWSTR text) {

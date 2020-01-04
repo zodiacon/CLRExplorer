@@ -35,6 +35,8 @@
 #define IDI_OBJECT                      229
 #define IDI_FREE                        230
 #define IDI_THREAD_NATIVE               231
+#define IDR_MENU1                       232
+#define IDR_CONTEXT                     232
 #define IDC_PROCLIST                    1000
 #define IDC_TEXT                        1001
 #define IDC_CLEAR                       1002
@@ -53,13 +55,14 @@
 #define ID_TARGET_ALLSTRINGS            32785
 #define ID_TARGET_HEAPSTATS             32786
 #define ID_OPTIONS_ALWAYSONTOP          32791
+#define ID_HEAPSTATS_SHOWALLINSTANCES   32792
 
 // Next default values for new objects
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        232
-#define _APS_NEXT_COMMAND_VALUE         32792
+#define _APS_NEXT_RESOURCE_VALUE        233
+#define _APS_NEXT_COMMAND_VALUE         32793
 #define _APS_NEXT_CONTROL_VALUE         1004
 #define _APS_NEXT_SYMED_VALUE           102
 #endif

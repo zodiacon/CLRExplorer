@@ -140,8 +140,11 @@ LRESULT CMainFrame::OnFileOpen(WORD, WORD, HWND, BOOL&) {
 
 LRESULT CMainFrame::OnWindowClose(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCtl*/, BOOL& /*bHandled*/) {
 	int nActivePage = m_view.GetActivePage();
-	if (nActivePage != -1)
+	if (nActivePage != -1) {
+		auto data = m_view.GetPageData(nActivePage);
 		m_view.RemovePage(nActivePage);
+		m_TreeMgr.TabClosed((DWORD_PTR)data);
+	}
 	else
 		::MessageBeep((UINT)-1);
 	UIEnable(ID_WINDOW_CLOSE, m_view.GetPageCount() > 0);
@@ -151,6 +154,7 @@ LRESULT CMainFrame::OnWindowClose(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWn
 
 LRESULT CMainFrame::OnWindowCloseAll(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCtl*/, BOOL& /*bHandled*/) {
 	m_view.RemoveAllPages();
+	m_TreeMgr.CloseAllTabs();
 
 	return 0;
 }
@@ -286,12 +290,18 @@ void CMainFrame::SwitchToPage(int page) {
 	m_view.SetActivePage(page);
 }
 
-void CMainFrame::AddTab(DWORD_PTR type) {
+void CMainFrame::AddTab(DWORD_PTR type, NodeType genericType, NodeType parentNode) {
 	int image;
-	auto hTab = TabFactory::CreateTab(m_DataTarget.get(), type, m_view, image);
+	auto hTab = TabFactory::CreateTab(m_DataTarget.get(), type, m_view, this, image, genericType);
 	if (hTab) {
 		WCHAR text[128];
 		::GetWindowText(hTab, text, _countof(text));
 		m_view.AddPage(hTab, text, image, (PVOID)type);
+		if (parentNode != NodeType::None)
+			m_TreeMgr.CreateNode(text, image, type, parentNode);
 	}
+}
+
+UINT CMainFrame::ShowContextMenu(HMENU hMenu, const POINT& pt, DWORD flags) {
+	return (UINT)m_CmdBar.TrackPopupMenu(hMenu, flags, pt.x, pt.y);
 }

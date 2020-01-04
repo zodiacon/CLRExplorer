@@ -51,7 +51,7 @@ struct HeapStatItem {
 	CString TypeName;
 };
 
-using EnumObjectCallback = std::function<bool(ObjectInfo& obj, void* userData)>;
+using EnumObjectCallback = std::function<bool(ObjectInfo& obj)>;
 
 class DataTarget abstract {
 public:
@@ -79,13 +79,13 @@ public:
 	std::vector<DacpModuleData> EnumModulesInAppDomain(CLRDATA_ADDRESS addr);
 	std::vector<DacpModuleData> EnumModules();
 	std::vector<SyncBlockInfo> EnumSyncBlocks(bool includeFree);
-	bool EnumObjects(EnumObjectCallback callback, void* userData = nullptr);
+	bool EnumObjects(EnumObjectCallback callback);
 	std::vector<HeapStatItem> GetHeapStats(CLRDATA_ADDRESS address = 0);
 
 	DacpThreadData GetThreadData(CLRDATA_ADDRESS addr);
 	CString GetObjectClassName(CLRDATA_ADDRESS address);
 	CString GetObjectString(CLRDATA_ADDRESS address, unsigned maxLength = 256);
-	DacpMethodTableData GetMethodTableInfo(CLRDATA_ADDRESS mt);
+	MethodTableInfo GetMethodTableInfo(CLRDATA_ADDRESS mt);
 
 	AppDomainInfo GetSharedDomain();
 	AppDomainInfo GetSystemDomain();
@@ -101,7 +101,7 @@ public:
 	DacpThreadStoreData GetThreadsStats();
 	
 protected:
-	bool EnumObjectsInternal(DacpGcHeapDetails& details, EnumObjectCallback callback, void* userData);
+	bool EnumObjectsInternal(DacpGcHeapDetails& details, EnumObjectCallback callback);
 	void EnumModulesInternal(CLRDATA_ADDRESS assembly, std::vector<DacpModuleData>& modules);
 	void EnumAssembliesInternal(CLRDATA_ADDRESS appDomain, std::vector<AssemblyInfo>& assemblies);
 

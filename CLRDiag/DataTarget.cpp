@@ -233,7 +233,7 @@ DacpGcHeapDetails DataTarget::GetWksHeap() {
 	return details;
 }
 
-bool DataTarget::EnumObjects(EnumObjectCallback callback, void* userData) {
+bool DataTarget::EnumObjects(EnumObjectCallback callback) {
 	CComQIPtr<ISOSDacInterface> spSos(_spSos);
 	DacpGcHeapData data;
 	spSos->GetGCHeapData(&data);
@@ -248,7 +248,7 @@ bool DataTarget::EnumObjects(EnumObjectCallback callback, void* userData) {
 		for (unsigned i = 0; i < count; i++) {
 			hr = spSos->GetGCHeapDetails(heaps[i], &details);
 			ATLASSERT(SUCCEEDED(hr));
-			if (!EnumObjectsInternal(details, callback, userData))
+			if (!EnumObjectsInternal(details, callback))
 				break;
 		}
 	}
@@ -256,7 +256,7 @@ bool DataTarget::EnumObjects(EnumObjectCallback callback, void* userData) {
 		hr = spSos->GetGCHeapStaticData(&details);
 		if (FAILED(hr))
 			return false;
-		EnumObjectsInternal(details, callback, userData);
+		EnumObjectsInternal(details, callback);
 	}
 	return true;
 }
@@ -335,7 +335,7 @@ DacpThreadStoreData DataTarget::GetThreadsStats() {
 
 constexpr int min_obj_size = sizeof(BYTE*) + sizeof(PVOID) + sizeof(size_t);
 
-bool DataTarget::EnumObjectsInternal(DacpGcHeapDetails& heap, EnumObjectCallback callback, void* userData) {
+bool DataTarget::EnumObjectsInternal(DacpGcHeapDetails& heap, EnumObjectCallback callback) {
 	DacpHeapSegmentData segdata;
 	CComQIPtr<ISOSDacInterface> spSos(_spSos);
 	ObjectInfo obj;
@@ -382,7 +382,7 @@ bool DataTarget::EnumObjectsInternal(DacpGcHeapDetails& heap, EnumObjectCallback
 
 		obj.Address = current;
 		//obj.Generation = gen;
-		if (!callback(obj, userData))
+		if (!callback(obj))
 			return true;
 		current += Align(obj.Size);
 	}
@@ -424,7 +424,7 @@ bool DataTarget::EnumObjectsInternal(DacpGcHeapDetails& heap, EnumObjectCallback
 		}
 		obj.Address = current;
 		obj.Generation = 3;
-		if (!callback(obj, userData))
+		if (!callback(obj))
 			return true;
 		current += Align(obj.Size);
 	}
@@ -447,10 +447,15 @@ CString DataTarget::GetObjectString(CLRDATA_ADDRESS address, unsigned maxLength)
 	return FAILED(hr) ? L"" : buffer.get();
 }
 
-DacpMethodTableData DataTarget::GetMethodTableInfo(CLRDATA_ADDRESS mt) {
+MethodTableInfo DataTarget::GetMethodTableInfo(CLRDATA_ADDRESS mt) {
 	CComQIPtr<ISOSDacInterface> spSos(_spSos);
-	DacpMethodTableData info;
+	MethodTableInfo info;
 	spSos->GetMethodTableData(mt, &info);
+	WCHAR name[512];
+	unsigned len;
+	spSos->GetMethodTableName(mt, _countof(name), name, &len);
+	info.Index = -1;
+	info.Name = name;
 	return info;
 }
 
@@ -462,7 +467,7 @@ std::vector<HeapStatItem> DataTarget::GetHeapStats(CLRDATA_ADDRESS address) {
 	HRESULT hr;
 	unsigned len;
 	CComQIPtr<ISOSDacInterface> spSos(_spSos);
-	EnumObjects([&](ObjectInfo& obj, auto) {
+	EnumObjects([&](ObjectInfo& obj) {
 		auto it = items.find(obj.MethodTable);
 		if (it == items.end()) {
 			HeapStatItem info;

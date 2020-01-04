@@ -11,7 +11,9 @@ enum class NodeType : size_t {
 	GCHeaps,
 	SyncBlocks,
 	AllStrings,
-	HeapStats
+	HeapStats,
+	MethodTable = 0x100,
+	None = -1
 };
 
 struct IGenericListView {
@@ -42,6 +44,7 @@ struct IGenericListViewCallback {
 	virtual bool CanExecuteCommand(WORD id) {
 		return true;
 	}
+	virtual void OnDoubleClick(int selected) {}
 };
 
 struct IToolBarProvider {
@@ -52,5 +55,6 @@ struct IToolBarProvider {
 struct IMainFrame {
 	virtual int FindTab(DWORD_PTR data) = 0;
 	virtual void SwitchToPage(int page) = 0;
-	virtual void AddTab(DWORD_PTR type) = 0;
+	virtual void AddTab(DWORD_PTR type, NodeType genericType = NodeType::None, NodeType parent = NodeType::None) = 0;
+	virtual UINT ShowContextMenu(HMENU hMenu, const POINT& pt, DWORD flags = 0) = 0;
 };

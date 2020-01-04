@@ -86,7 +86,8 @@ public:
 	// IMainFrame
 	int FindTab(DWORD_PTR data) override;
 	void SwitchToPage(int page) override;
-	void AddTab(DWORD_PTR type) override;
+	void AddTab(DWORD_PTR type, NodeType genericType = NodeType::None, NodeType parentNode = NodeType::None) override;
+	UINT ShowContextMenu(HMENU hMenu, const POINT& pt, DWORD flags) override;
 
 private:
 	std::unique_ptr<DataTarget> m_DataTarget;

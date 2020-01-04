@@ -13,14 +13,14 @@ int StringsView::GetItemCount() {
 	_strings.clear();
 	_allStrings.reserve(1 << 15);
 	_strings.reserve(1 << 15);
-	_target->EnumObjects([&](auto& obj, auto param) {
+	_target->EnumObjects([&](auto& obj) {
 		if (obj.ObjectType == OBJ_STRING) {
 			GetStringValue(obj);
 			_strings.push_back(static_cast<int>(_strings.size()));
-			_allStrings.push_back(std::move(obj));
+			_allStrings.push_back(obj);
 		}
 		return true;
-		}, this);
+		});
 
 	return static_cast<int>(_strings.size());
 }

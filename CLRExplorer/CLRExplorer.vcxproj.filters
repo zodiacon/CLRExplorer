@@ -75,6 +75,9 @@
     <ClCompile Include="HeapStatsView.cpp">
       <Filter>Views</Filter>
     </ClCompile>
+    <ClCompile Include="ModulesView.cpp">
+      <Filter>Views</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="MainFrm.h">
@@ -141,6 +144,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="HeapStatsView.h">
+      <Filter>Views</Filter>
+    </ClInclude>
+    <ClInclude Include="ModulesView.h">
       <Filter>Views</Filter>
     </ClInclude>
   </ItemGroup>

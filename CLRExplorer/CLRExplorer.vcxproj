@@ -215,6 +215,7 @@
     <ClCompile Include="GenericListView.cpp" />
     <ClCompile Include="HeapStatsView.cpp" />
     <ClCompile Include="MainFrm.cpp" />
+    <ClCompile Include="ModulesView.cpp" />
     <ClCompile Include="ObjectsView.cpp" />
     <ClCompile Include="pch.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
@@ -240,6 +241,7 @@
     <ClInclude Include="HeapStatsView.h" />
     <ClInclude Include="Interfaces.h" />
     <ClInclude Include="MainFrm.h" />
+    <ClInclude Include="ModulesView.h" />
     <ClInclude Include="ObjectsView.h" />
     <ClInclude Include="ProcessSelectDlg.h" />
     <ClInclude Include="QuickFIlterDialogBar.h" />

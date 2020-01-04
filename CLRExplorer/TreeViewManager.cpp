@@ -14,7 +14,7 @@ void TreeViewManager::InitOnce() {
 
 	UINT icons[] = {
 		IDI_APP, IDI_PACKAGE, IDI_ASSEMBLY, IDI_MODULE, IDI_THREADPOOL, IDI_THREAD, IDI_INFO,
-		IDI_SYNCBLK, IDI_MEMORY, IDI_STRING, IDI_HEAP_STATS
+		IDI_SYNCBLK, IDI_MEMORY, IDI_STRING, IDI_HEAP_STATS, IDI_OBJECT
 	};
 
 	for (auto id : icons)
@@ -31,24 +31,17 @@ bool TreeViewManager::Init(DataTarget* dt, PCWSTR name) {
 	CString rootText;
 	rootText.Format(L"%s (%u)", name, dt->GetProcessId());
 	auto root = _tv.InsertItem(rootText, 0, 0, TVI_ROOT, TVI_LAST);
-	auto summary = root.AddTail(L"Summary", 6);
-	summary.SetData((DWORD_PTR)NodeType::Summary);
-	auto appDomainsNode = root.InsertAfter(L"AppDomains", root, 1);
-	appDomainsNode.SetData((DWORD_PTR)NodeType::AppDomains);
-	auto assemblies = root.AddTail(L"All Assemblies", 2);
-	assemblies.SetData((DWORD_PTR)NodeType::AllAssemblies);
-	auto modules = root.AddTail(L"All Modules", 3);
-	//auto heaps = root.AddTail(L"GC Heaps", 8);
-	//heaps.SetData((DWORD_PTR)NodeType::GCHeaps);
-	auto heapStats = root.AddTail(L"Heap Stats", 10);
-	heapStats.SetData((DWORD_PTR)NodeType::HeapStats);
-	auto threads = root.AddTail(L"Threads", 5);
-	threads.SetData((DWORD_PTR)NodeType::Threads);
-	auto threadPool = root.AddTail(L"Thread Pool", 4);
-	auto syncBlocks = root.AddTail(L"Sync Blocks", 7);
-	syncBlocks.SetData((DWORD_PTR)NodeType::SyncBlocks);
-	auto strings = root.AddTail(L"All Strings", 9);
-	strings.SetData((DWORD_PTR)NodeType::AllStrings);
+	_rootNode = root;
+
+	auto summary = AddNode(L"Summary", 6, NodeType::Summary, root);
+	auto appDomainsNode = AddNode(L"AppDomains", 1, NodeType::AppDomains, root);
+	auto assemblies = AddNode(L"All Assemblies", 2, NodeType::AllAssemblies, root);
+	auto modules = AddNode(L"All Modules", 3, NodeType::AllModules, root);
+	auto heapStats = AddNode(L"Heap Stats", 10, NodeType::HeapStats, root);
+	auto threads = AddNode(L"Threads", 5, NodeType::Threads, root);
+	auto threadPool = AddNode(L"Thread Pool", 4, NodeType::ThreadPool, root);
+	auto syncBlocks = AddNode(L"Sync Blocks", 7, NodeType::SyncBlocks, root);
+	auto strings = AddNode(L"All Strings", 9, NodeType::AllStrings, root);
 
 	root.Expand(TVE_EXPAND);
 
@@ -66,4 +59,31 @@ void TreeViewManager::DoubleClickNode(HTREEITEM hItem) {
 	else {
 		_frame->AddTab(data);
 	}
+}
+
+CTreeItem TreeViewManager::CreateNode(PCWSTR text, int image, DWORD_PTR data, NodeType parent) {
+	auto node = _nodes[(DWORD_PTR)parent];
+	auto newNode = AddNode(text, image, data, node);
+	return newNode;
+}
+
+void TreeViewManager::TabClosed(DWORD_PTR data) {
+	auto node = _nodes[data];
+	ATLASSERT(node);
+	if (node.GetParent() != _rootNode) {
+		node.Delete();
+		_nodes.erase(data);
+	}
+}
+
+void TreeViewManager::CloseAllTabs() {
+	std::vector<DWORD_PTR> items;
+	for (auto& [data, node] : _nodes) {
+		if (node.GetParent() != _rootNode) {
+			node.Delete();
+			items.push_back(data);
+		}
+	}
+	for (auto data : items)
+		_nodes.erase(data);
 }
