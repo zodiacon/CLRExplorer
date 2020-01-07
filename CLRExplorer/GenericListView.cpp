@@ -20,6 +20,7 @@ bool CGenericListView::IsSortable(int column) const {
 
 void CGenericListView::Refresh() {
 	SetItemCount(m_Callback->GetItemCount());
+	DoSort(GetSortInfo());
 }
 
 void CGenericListView::SetListViewItemCount(int count) {
@@ -27,8 +28,14 @@ void CGenericListView::SetListViewItemCount(int count) {
 	DoSort(GetSortInfo());
 }
 
+IListView* CGenericListView::GetListView() {
+	return m_spListView.p;
+}
+
 LRESULT CGenericListView::OnCreate(UINT, WPARAM, LPARAM, BOOL&) {
 	DefWindowProc();
+
+	SendMessage(LVM_QUERYINTERFACE, reinterpret_cast<WPARAM>(&__uuidof(IListView)), reinterpret_cast<LPARAM>(&m_spListView));
 
 	SetExtendedListViewStyle(LVS_EX_DOUBLEBUFFER | LVS_EX_FULLROWSELECT);
 

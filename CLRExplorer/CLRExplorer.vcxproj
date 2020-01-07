@@ -239,6 +239,7 @@
     <ClInclude Include="FormatHelper.h" />
     <ClInclude Include="GenericListView.h" />
     <ClInclude Include="HeapStatsView.h" />
+    <ClInclude Include="IListView.h" />
     <ClInclude Include="Interfaces.h" />
     <ClInclude Include="MainFrm.h" />
     <ClInclude Include="ModulesView.h" />

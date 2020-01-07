@@ -2,6 +2,7 @@
 
 #include "VirtualListView.h"
 #include "Interfaces.h"
+#include "IListView.h"
 
 class CGenericListView :
 	public CVirtualListView<CGenericListView>,
@@ -29,6 +30,7 @@ public:
 	bool IsSortable(int column) const;
 	void Refresh() override;
 	void SetListViewItemCount(int count) override;
+	IListView* GetListView() override;
 
 private:
 	LRESULT OnCreate(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/, BOOL& /*bHandled*/);
@@ -41,5 +43,6 @@ private:
 
 private:
 	IGenericListViewCallback* m_Callback;
+	CComPtr<IListView> m_spListView;
 	bool m_AutoDelete : 1;
 };

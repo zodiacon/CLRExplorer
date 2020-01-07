@@ -11,6 +11,10 @@ struct AppDomainInfo : DacpAppDomainData {
 	CString Name;
 };
 
+struct ModuleInfo : DacpModuleData {
+	CString Name, FileName;
+};
+
 struct AssemblyInfo : DacpAssemblyData {
 	CString Name;
 };
@@ -28,6 +32,13 @@ enum class ThreadType {
 	Unknown = 0,
 	ThreadPoolWorker,
 	Finalizer,
+};
+
+struct TaskInfo {
+	ULONG64 Id;
+	ULONG32 OSThreadId;
+	CLRDATA_ADDRESS ObjectAddress;
+	CString Name;
 };
 
 struct ThreadInfo : DacpThreadData {
@@ -49,6 +60,22 @@ struct HeapStatItem {
 	long long TotalSize;
 	DacpObjectType Type;
 	CString TypeName;
+};
+
+struct FieldInfo {
+	CString Name;
+};
+
+struct MethodInfo {
+	CString Name;
+};
+
+struct TypeInfo {
+	CLRDATA_ADDRESS Module;
+	CString Name;
+	mdToken Token;
+	std::vector<FieldInfo> Fields;
+	std::vector<MethodInfo> Methods;
 };
 
 using EnumObjectCallback = std::function<bool(ObjectInfo& obj)>;
@@ -73,19 +100,22 @@ public:
 	std::vector<AssemblyInfo> EnumAssemblies(AppDomainInfo& ad);
 	std::vector<AssemblyInfo> EnumAssemblies(CLRDATA_ADDRESS appDomainAddress);
 	std::vector<AssemblyInfo> EnumAssemblies(bool includeSysSharedDomains = false);
-	std::vector<DacpModuleData> EnumModules(const DacpAssemblyData& assembly);
-	std::vector<DacpModuleData> EnumModules(CLRDATA_ADDRESS assembly);
-	std::vector<DacpModuleData> EnumModulesInAppDomain(const DacpAppDomainData& ad);
-	std::vector<DacpModuleData> EnumModulesInAppDomain(CLRDATA_ADDRESS addr);
-	std::vector<DacpModuleData> EnumModules();
+	std::vector<ModuleInfo> EnumModules(const DacpAssemblyData& assembly);
+	std::vector<ModuleInfo> EnumModules(CLRDATA_ADDRESS assembly);
+	std::vector<ModuleInfo> EnumModulesInAppDomain(const DacpAppDomainData& ad);
+	std::vector<ModuleInfo> EnumModulesInAppDomain(CLRDATA_ADDRESS addr);
+	std::vector<ModuleInfo> EnumModules();
 	std::vector<SyncBlockInfo> EnumSyncBlocks(bool includeFree);
 	bool EnumObjects(EnumObjectCallback callback);
 	std::vector<HeapStatItem> GetHeapStats(CLRDATA_ADDRESS address = 0);
+	std::vector<TaskInfo> EnumTasks();
+	std::vector<TypeInfo> EnumTypesInModule(CLRDATA_ADDRESS module);
 
 	DacpThreadData GetThreadData(CLRDATA_ADDRESS addr);
 	CString GetObjectClassName(CLRDATA_ADDRESS address);
 	CString GetObjectString(CLRDATA_ADDRESS address, unsigned maxLength = 256);
 	MethodTableInfo GetMethodTableInfo(CLRDATA_ADDRESS mt);
+	TaskInfo GetTaskById(ULONG64 id);
 
 	AppDomainInfo GetSharedDomain();
 	AppDomainInfo GetSystemDomain();
@@ -102,7 +132,7 @@ public:
 	
 protected:
 	bool EnumObjectsInternal(DacpGcHeapDetails& details, EnumObjectCallback callback);
-	void EnumModulesInternal(CLRDATA_ADDRESS assembly, std::vector<DacpModuleData>& modules);
+	void EnumModulesInternal(CLRDATA_ADDRESS assembly, std::vector<ModuleInfo>& modules);
 	void EnumAssembliesInternal(CLRDATA_ADDRESS appDomain, std::vector<AssemblyInfo>& assemblies);
 
 	virtual HRESULT Init() = 0;

@@ -44,21 +44,21 @@ std::vector<AssemblyInfo> DataTarget::EnumAssemblies(AppDomainInfo& ad) {
 	return EnumAssemblies(ad.AppDomainPtr);
 }
 
-std::vector<DacpModuleData> DataTarget::EnumModules(const DacpAssemblyData& assembly) {
+std::vector<ModuleInfo> DataTarget::EnumModules(const DacpAssemblyData& assembly) {
 	return EnumModules(assembly.AssemblyPtr);
 }
 
-std::vector<DacpModuleData> DataTarget::EnumModules(CLRDATA_ADDRESS assembly) {
-	std::vector<DacpModuleData> modules;
+std::vector<ModuleInfo> DataTarget::EnumModules(CLRDATA_ADDRESS assembly) {
+	std::vector<ModuleInfo> modules;
 	EnumModulesInternal(assembly, modules);
 	return modules;
 }
 
-std::vector<DacpModuleData> DataTarget::EnumModulesInAppDomain(const DacpAppDomainData& ad) {
+std::vector<ModuleInfo> DataTarget::EnumModulesInAppDomain(const DacpAppDomainData& ad) {
 	return EnumModulesInAppDomain(ad.AppDomainPtr);
 }
 
-void DataTarget::EnumModulesInternal(CLRDATA_ADDRESS assembly, std::vector<DacpModuleData>& modules) {
+void DataTarget::EnumModulesInternal(CLRDATA_ADDRESS assembly, std::vector<ModuleInfo>& modules) {
 	CComQIPtr<ISOSDacInterface> spSos(_spSos);
 	CLRDATA_ADDRESS addr[16];
 	unsigned count;
@@ -68,8 +68,18 @@ void DataTarget::EnumModulesInternal(CLRDATA_ADDRESS assembly, std::vector<DacpM
 
 	modules.reserve(count);
 	for (DWORD i = 0; i < count; i++) {
-		DacpModuleData data;
+		ModuleInfo data;
 		spSos->GetModuleData(addr[i], &data);
+		CComPtr<IXCLRDataModule> spModule;
+		spSos->GetModule(addr[i], &spModule);
+		if (spModule) {
+			WCHAR name[MAX_PATH];
+			ULONG32 len;
+			if (S_OK == spModule->GetName(_countof(name), &len, name))
+				data.Name = name;
+			if (S_OK == spModule->GetFileName(_countof(name), &len, name))
+				data.FileName = name;
+		}
 		modules.push_back(data);
 	}
 }
@@ -94,8 +104,8 @@ void DataTarget::EnumAssembliesInternal(CLRDATA_ADDRESS appDomain, std::vector<A
 	}
 }
 
-std::vector<DacpModuleData> DataTarget::EnumModulesInAppDomain(CLRDATA_ADDRESS addr) {
-	std::vector<DacpModuleData> modules;
+std::vector<ModuleInfo> DataTarget::EnumModulesInAppDomain(CLRDATA_ADDRESS addr) {
+	std::vector<ModuleInfo> modules;
 	CComQIPtr<ISOSDacInterface> spSos(_spSos);
 	CLRDATA_ADDRESS assemblies[512];
 	int count;
@@ -109,9 +119,9 @@ std::vector<DacpModuleData> DataTarget::EnumModulesInAppDomain(CLRDATA_ADDRESS a
 	return modules;
 }
 
-std::vector<DacpModuleData> DataTarget::EnumModules() {
+std::vector<ModuleInfo> DataTarget::EnumModules() {
 	CComQIPtr<ISOSDacInterface> spSos(_spSos);
-	std::vector<DacpModuleData> modules;
+	std::vector<ModuleInfo> modules;
 	CLRDATA_ADDRESS addr[16];
 	unsigned needed;
 	auto hr = spSos->GetAppDomainList(_countof(addr), addr, &needed);
@@ -308,6 +318,8 @@ std::vector<ThreadInfo> DataTarget::EnumThreads(bool includeDeadThreads) {
 	std::vector<ThreadInfo> threads;
 	CComQIPtr<ISOSDacInterface> spSos(_spSos);
 	ATLASSERT(spSos);
+	CComQIPtr<IXCLRDataProcess2> spProcess(_spSos);
+	ATLASSERT(spProcess);
 
 	auto stat = GetThreadsStats();
 	threads.reserve(stat.threadCount + 10);
@@ -496,4 +508,83 @@ std::vector<HeapStatItem> DataTarget::GetHeapStats(CLRDATA_ADDRESS address) {
 		hitems.push_back(mt);
 
 	return hitems;
+}
+
+std::vector<TaskInfo> DataTarget::EnumTasks() {
+	CComQIPtr<IXCLRDataProcess> spProcess(_spSos);
+	ATLASSERT(spProcess);
+	CLRDATA_ENUM hEnum;
+	std::vector<TaskInfo> tasks;
+
+	WCHAR name[256];
+	ULONG32 len;
+	if (S_OK == spProcess->StartEnumTasks(&hEnum)) {
+		tasks.reserve(8);
+		for (;;) {
+			CComPtr<IXCLRDataTask> spTask;
+			spProcess->EnumTask(&hEnum, &spTask);
+			if (spTask == nullptr)
+				break;
+			TaskInfo info;
+			spTask->GetUniqueID(&info.Id);
+			spTask->GetOSThreadID(&info.OSThreadId);
+			if(S_OK == spTask->GetName(_countof(name), &len, name))
+				info.Name = name;
+			CComPtr<IXCLRDataValue> spObject;
+			spTask->GetManagedObject(&spObject);
+			ATLASSERT(spObject);
+			spObject->GetAddress(&info.ObjectAddress);
+			tasks.push_back(info);
+		}
+		spProcess->EndEnumTasks(hEnum);
+	}
+	return tasks;
+}
+
+std::vector<TypeInfo> DataTarget::EnumTypesInModule(CLRDATA_ADDRESS module) {
+	CComQIPtr<IXCLRDataProcess> spProcess(_spSos);
+	ATLASSERT(spProcess);
+	std::vector<TypeInfo> types;
+	CComPtr<IXCLRDataModule> spModule;
+	auto hr = spProcess->GetModuleByAddress(module, &spModule);
+	if (FAILED(hr))
+		return types;
+
+	CLRDATA_ENUM hEnum;
+	if (S_OK == spModule->StartEnumTypeDefinitions(&hEnum)) {
+		WCHAR name[512];
+		ULONG32 len;
+		types.reserve(32);
+		for (;;) {
+			CComPtr<IXCLRDataTypeDefinition> spType;
+			spModule->EnumTypeDefinition(&hEnum, &spType);
+			if (spType == nullptr)
+				break;
+			TypeInfo info;
+			if (S_OK == spType->GetName(0, _countof(name), &len, name))
+				info.Name = name;
+			types.emplace_back(std::move(info));
+		}
+		spModule->EndEnumTypeDefinitions(hEnum);
+	}
+
+	return types;
+}
+
+TaskInfo DataTarget::GetTaskById(ULONG64 id) {
+	TaskInfo info = { 0 };
+	CComQIPtr<IXCLRDataProcess> spProcess(_spSos);
+	CComPtr<IXCLRDataTask> spTask;
+	spProcess->GetTaskByUniqueID(id, &spTask);
+	if (spTask == nullptr)
+		return info;
+
+	spTask->GetUniqueID(&info.Id);
+	spTask->GetOSThreadID(&info.OSThreadId);
+	CComPtr<IXCLRDataValue> spObject;
+	spTask->GetManagedObject(&spObject);
+	if(spObject)
+		spObject->GetAddress(&info.ObjectAddress);
+
+	return info;
 }

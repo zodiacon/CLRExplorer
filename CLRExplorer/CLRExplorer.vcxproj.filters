@@ -149,6 +149,9 @@
     <ClInclude Include="ModulesView.h">
       <Filter>Views</Filter>
     </ClInclude>
+    <ClInclude Include="IListView.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="CLRExplorer.rc">

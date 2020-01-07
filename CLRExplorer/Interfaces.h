@@ -1,5 +1,7 @@
 #pragma once
 
+#include "IListView.h"
+
 enum class NodeType : size_t {
 	Root,
 	Summary,
@@ -13,10 +15,11 @@ enum class NodeType : size_t {
 	AllStrings,
 	HeapStats,
 	MethodTable = 0x100,
-	None = -1
+	None = (size_t)-1
 };
 
 struct IGenericListView {
+	virtual IListView* GetListView() = 0;
 	virtual void Refresh() = 0;
 	virtual void SetListViewItemCount(int count) = 0;
 };

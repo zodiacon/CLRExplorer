@@ -54,8 +54,13 @@ int main(int argc, const char* argv[]) {
 
 	::CoInitialize(nullptr);
 
-	//auto dt = DataTarget::FromProcessId(atoi(argv[1]));
+//	auto dt = DataTarget::FromProcessId(atoi(argv[1]));
+
+#ifdef _WIN64
+	auto dt = DataTarget::FromDumpFile(L"c:\\temp\\Snagit32.exe_191231_181145.dmp");
+#else
 	auto dt = DataTarget::FromDumpFile(L"c:\\temp\\HlpViewer.exe_191231_122702.dmp");
+#endif
 	if (dt == nullptr) {
 		printf("Error connecting to target\n");
 		return 1;

@@ -50,10 +50,10 @@ LRESULT CGenericView::OnSize(UINT, WPARAM, LPARAM lParam, BOOL&) {
 			m_ToolBar.MoveWindow(0, 0, cx, rc.bottom);
 		}
 		if (m_hWndDialogBar) {
-			CRect rcDialogBar;
-			::GetClientRect(m_hWndDialogBar, &rcDialogBar);
-			::MoveWindow(m_hWndDialogBar, 0, rc.bottom, cx, rcDialogBar.Height(), TRUE);
-			rc.bottom += rcDialogBar.Height();
+			if(m_rcDialogBar.IsRectEmpty())
+				::GetClientRect(m_hWndDialogBar, &m_rcDialogBar);
+			::MoveWindow(m_hWndDialogBar, 0, rc.bottom, cx, m_rcDialogBar.Height(), TRUE);
+			rc.bottom += m_rcDialogBar.Height();
 		}
 		m_ListView.MoveWindow(0, rc.bottom, cx, cy - rc.bottom);
 	}

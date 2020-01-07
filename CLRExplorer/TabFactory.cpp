@@ -10,6 +10,7 @@
 #include "ObjectsView.h"
 #include "HeapStatsView.h"
 #include "ObjectsView.h"
+#include "ModulesView.h"
 
 constexpr DWORD viewStyle = WS_CHILD | WS_VISIBLE | WS_CLIPCHILDREN | WS_CLIPSIBLINGS;
 
@@ -35,6 +36,15 @@ HWND TabFactory::CreateTab(DataTarget* dt, DWORD_PTR type, HWND hParent, IMainFr
 			auto view = new CGenericView(impl, nullptr, impl);
 			hTab = view->Create(hParent, CRect(), L"All Assemblies", viewStyle);
 			image = 2;
+			break;
+		}
+
+		case NodeType::AllModules:
+		{
+			auto impl = new ModulesView(dt);
+			auto view = new CGenericView(impl, nullptr, impl);
+			hTab = view->Create(hParent, CRect(), L"All Modules", viewStyle);
+			image = 3;
 			break;
 		}
 

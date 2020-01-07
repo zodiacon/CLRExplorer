@@ -92,9 +92,9 @@ HWND HeapStatsView::Create(HWND hParent) {
 
 void HeapStatsView::ShowAllInstances(int selected) {
 	auto& item = _items[selected];
-	int tab = _frame->FindTab(item.MethodTable);
+	int tab = _frame->FindTab((DWORD_PTR)item.MethodTable);
 	if (tab < 0) {
-		_frame->AddTab(item.MethodTable, NodeType::MethodTable, NodeType::HeapStats);
+		_frame->AddTab((DWORD_PTR)item.MethodTable, NodeType::MethodTable, NodeType::HeapStats);
 	}
 }
 

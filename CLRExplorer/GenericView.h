@@ -45,5 +45,6 @@ private:
 	IToolBarProvider* m_ToolBarCB;
 	IDialogBarProvider* m_DialogBar;
 	HWND m_hWndDialogBar{ nullptr };
+	CRect m_rcDialogBar;
 	IGenericListViewCallback* m_ListViewCB;
 };

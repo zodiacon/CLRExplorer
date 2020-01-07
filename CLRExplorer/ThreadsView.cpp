@@ -154,3 +154,4 @@ bool ThreadsView::CompareItems(const ThreadInfo& t1, const ThreadInfo& t2, int c
 	ATLASSERT(false);
 	return false;
 }
+
