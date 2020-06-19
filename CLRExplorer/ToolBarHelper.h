@@ -1,14 +1,5 @@
 #pragma once
 
-// Define various toolbar button styles in case they are missing
-#ifndef TBSTYLE_EX_MIXEDBUTTONS
-#define TBSTYLE_EX_MIXEDBUTTONS			0x00000008
-#endif
-
-#ifndef BTNS_SHOWTEXT
-#define BTNS_SHOWTEXT				0x0040
-#endif
-
 #define ATL_SIMPLE_TOOLBAR_PANE_STYLE_EX	(ATL_SIMPLE_TOOLBAR_PANE_STYLE|TBSTYLE_LIST)
 
 template <class T>
@@ -187,6 +178,47 @@ public:
 		CRect rectToolBar;
 		CRect rectCombo;
 		toolbar.GetClientRect(&rectToolBar);
+		combo.GetWindowRect(rectCombo);
+		// Get the different between the heights of the toolbar and
+		// the combobox
+		int nDiff = rectToolBar.Height() - rectCombo.Height();
+		// If there is a difference, then move the combobox
+		if (nDiff > 1) {
+			toolbar.ScreenToClient(&rectCombo);
+			combo.MoveWindow(rectCombo.left, rc.top + (nDiff / 2), rectCombo.Width(), rectCombo.Height());
+		}
+		return combo;
+	}
+
+	HWND CreateToolbarControl(HWND hWndToolBar, HWND hControl, UINT nID, UINT nWidth = 16, UINT nHeight = 16) {
+		T* pT = static_cast<T*>(this);
+		// Use built-in WTL toolbar wrapper class
+		CToolBarCtrl toolbar(hWndToolBar);
+		// Get the size of the combobox font
+		CreateComboFont();
+		CSize sizeFont = GetComboFontSize();
+		// Compute the width and height
+		UINT cx = (nWidth + 8) * sizeFont.cx;
+		UINT cy = nHeight * sizeFont.cy;
+		// Set the button width
+		CTBButtonInfo tbi(TBIF_SIZE | TBIF_STATE | TBIF_STYLE);
+		// Make sure the underlying button is disabled
+		tbi.fsState = 0;
+		// BTNS_SHOWTEXT will allow the button size to be altered
+		tbi.fsStyle = BTNS_SHOWTEXT;
+		tbi.cx = static_cast<WORD>(cx);
+		toolbar.SetButtonInfo(nID, &tbi);
+		// Get the index of the toolbar button
+		int nIndex = toolbar.CommandToIndex(nID);
+		// Get the button rect
+		CRect rc;
+		toolbar.GetItemRect(nIndex, rc);
+		rc.bottom = cy;
+
+		CRect rectToolBar;
+		CRect rectCombo;
+		toolbar.GetClientRect(&rectToolBar);
+		CWindow combo(hControl);
 		combo.GetWindowRect(rectCombo);
 		// Get the different between the heights of the toolbar and
 		// the combobox

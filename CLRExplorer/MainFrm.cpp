@@ -41,6 +41,7 @@ LRESULT CMainFrame::OnCreate(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/
 	CToolBarCtrl tb;
 	auto hWndToolBar = tb.Create(m_hWnd, nullptr, nullptr, ATL_SIMPLE_TOOLBAR_PANE_STYLE, 0, ATL_IDW_TOOLBAR);
 	InitToolBar(tb);
+
 	CreateSimpleReBar(ATL_SIMPLE_REBAR_NOBORDER_STYLE);
 	AddSimpleReBarBand(hWndCmdBar);
 	AddSimpleReBarBand(hWndToolBar, nullptr, TRUE);
@@ -135,6 +136,13 @@ LRESULT CMainFrame::OnFileOpen(WORD, WORD, HWND, BOOL&) {
 		m_TreeMgr.Init(m_DataTarget.get(), dlg.m_szFileTitle);
 		UpdateUI();
 	}
+	return 0;
+}
+
+LRESULT CMainFrame::OnAlwaysOnTop(WORD, WORD id, HWND, BOOL&) {
+	bool onTop = GetExStyle() & WS_EX_TOPMOST;
+	SetWindowPos(onTop ? HWND_NOTOPMOST : HWND_TOPMOST, 0, 0, 0, 0, SWP_NOSIZE | SWP_NOMOVE);
+	UISetCheck(id, !onTop);
 	return 0;
 }
 

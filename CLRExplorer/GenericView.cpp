@@ -20,43 +20,34 @@ void CGenericView::OnFinalMessage(HWND /*hWnd*/) {
 }
 
 LRESULT CGenericView::OnCreate(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/, BOOL& /*bHandled*/) {
-	m_ListView.Create(*this, rcDefault, nullptr, WS_CHILD | WS_VISIBLE | WS_CLIPSIBLINGS | WS_CLIPCHILDREN | LVS_REPORT | LVS_OWNERDATA | LVS_SINGLESEL);
-	m_ListView.SetExtendedListViewStyle(LVS_EX_FULLROWSELECT | LVS_EX_DOUBLEBUFFER);
+	m_hWndClient = m_ListView.Create(*this, rcDefault, nullptr, WS_CHILD | WS_VISIBLE | WS_CLIPSIBLINGS | WS_CLIPCHILDREN | LVS_REPORT | LVS_OWNERDATA | LVS_SINGLESEL);
+	m_ListView.SetExtendedListViewStyle(LVS_EX_FULLROWSELECT | LVS_EX_DOUBLEBUFFER | LVS_EX_INFOTIP);
 
-	m_ToolBar.Create(*this, rcDefault, nullptr,
-		WS_CHILD | WS_VISIBLE | WS_CLIPCHILDREN | WS_CLIPSIBLINGS | WS_BORDER | TBSTYLE_FLAT | TBSTYLE_TOOLTIPS,
-		WS_EX_CLIENTEDGE);
+	auto hWndToolBar = m_ToolBar.Create(m_hWnd, rcDefault, nullptr, ATL_SIMPLE_TOOLBAR_PANE_STYLE | TBSTYLE_LIST, 0, ATL_IDW_TOOLBAR);
+	m_ToolBar.SetExtendedStyle(TBSTYLE_EX_MIXEDBUTTONS);
+
 	if (m_ToolBarCB && !m_ToolBarCB->Init(m_ToolBar))
 		return -1;
 
 	if (m_DialogBar) {
-		m_hWndDialogBar = m_DialogBar->Create(*this);
-		if (m_hWndDialogBar)
-			::ShowWindow(m_hWndDialogBar, SW_SHOW);
-	}
-	return 0;
-}
-
-LRESULT CGenericView::OnSize(UINT, WPARAM, LPARAM lParam, BOOL&) {
-	if (m_ListView) {
-		int cx = GET_X_LPARAM(lParam), cy = GET_Y_LPARAM(lParam);
-		CRect rc;
-
-		if (m_ToolBar.GetButtonCount() == 0) {
-			m_ToolBar.ShowWindow(SW_HIDE);
-		}
-		else {
-			m_ToolBar.GetClientRect(&rc);
-			m_ToolBar.MoveWindow(0, 0, cx, rc.bottom);
-		}
+		m_hWndDialogBar = m_DialogBar->Create(m_ToolBar);
 		if (m_hWndDialogBar) {
-			if(m_rcDialogBar.IsRectEmpty())
-				::GetClientRect(m_hWndDialogBar, &m_rcDialogBar);
-			::MoveWindow(m_hWndDialogBar, 0, rc.bottom, cx, m_rcDialogBar.Height(), TRUE);
-			rc.bottom += m_rcDialogBar.Height();
+			CImageList tbImages;
+			tbImages.Create(24, 24, ILC_COLOR32, 4, 4);
+			m_ToolBar.SetImageList(tbImages);
+
+			::ShowWindow(m_hWndDialogBar, SW_SHOW);
+			auto id = 300;
+			if (m_ToolBarCB == nullptr)
+				m_ToolBar.AddButton(id, BTNS_BUTTON, TBSTATE_ENABLED, I_IMAGENONE, nullptr, 0);
+			CreateToolbarControl(m_ToolBar, m_hWndDialogBar, id);
 		}
-		m_ListView.MoveWindow(0, rc.bottom, cx, cy - rc.bottom);
 	}
+	CreateSimpleReBar(ATL_SIMPLE_REBAR_NOBORDER_STYLE);
+	AddSimpleReBarBand(m_ToolBar);
+	CReBarCtrl(m_hWndToolBar).LockBands(TRUE);
+	UIAddToolBar(hWndToolBar);
+
 	return 0;
 }
 
@@ -73,7 +64,7 @@ LRESULT CGenericView::OnCommand(UINT message, WPARAM wParam, LPARAM lParam, BOOL
 }
 
 LRESULT CGenericView::OnForwardMessage(UINT, WPARAM, LPARAM lParam, BOOL& handled) {
-	LRESULT result;
+	LRESULT result = 0;
 	auto msg = reinterpret_cast<MSG*>(lParam);
 	handled = ProcessWindowMessage(*this, msg->message, msg->wParam, msg->lParam, result, 1);
 	return result;

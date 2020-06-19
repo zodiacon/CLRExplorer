@@ -34,7 +34,7 @@ HWND TabFactory::CreateTab(DataTarget* dt, DWORD_PTR type, HWND hParent, IMainFr
 		{
 			auto impl = new AssembliesView(dt);
 			auto view = new CGenericView(impl, nullptr, impl);
-			hTab = view->Create(hParent, CRect(), L"All Assemblies", viewStyle);
+			hTab = view->Create(hParent, CRect(), L"Assemblies", viewStyle);
 			image = 2;
 			break;
 		}
@@ -43,7 +43,7 @@ HWND TabFactory::CreateTab(DataTarget* dt, DWORD_PTR type, HWND hParent, IMainFr
 		{
 			auto impl = new ModulesView(dt);
 			auto view = new CGenericView(impl, nullptr, impl);
-			hTab = view->Create(hParent, CRect(), L"All Modules", viewStyle);
+			hTab = view->Create(hParent, CRect(), L"Modules", viewStyle);
 			image = 3;
 			break;
 		}
@@ -79,7 +79,7 @@ HWND TabFactory::CreateTab(DataTarget* dt, DWORD_PTR type, HWND hParent, IMainFr
 		{
 			auto impl = new StringsView(dt);
 			auto view = new CGenericView(impl, nullptr, impl);
-			hTab = view->Create(hParent, CRect(), L"All Strings", viewStyle);
+			hTab = view->Create(hParent, CRect(), L"Strings", viewStyle);
 			image = 9;
 			break;
 		}
@@ -95,7 +95,7 @@ HWND TabFactory::CreateSpecificTab(DataTarget* dt, DWORD_PTR type, NodeType gene
 		case NodeType::MethodTable:
 			auto impl = new ObjectsView(dt, type);	// type is MT address
 			auto view = new CGenericView(impl);
-			hTab = view->Create(hParent, CRect(), L"Instances (" + impl->GetMethodTable().Name + L")", viewStyle);
+			hTab = view->Create(hParent, CRect(), L"Objects (" + impl->GetMethodTable().Name + L")", viewStyle);
 			image = 11;
 			break;
 	}

@@ -29,7 +29,7 @@ LRESULT CProcessSelectDlg::OnInitDialog(UINT, WPARAM, LPARAM, BOOL&) {
 	m_List.InsertColumn(4, L"Arch", LVCFMT_CENTER, 70);
 
 	m_Images.Create(16, 16, ILC_COLOR32, 32, 16);
-	m_Images.AddIcon(AtlLoadIcon(IDI_APP));
+	m_Images.AddIcon(AtlLoadSysIcon(IDI_APPLICATION));
 	m_List.SetImageList(m_Images, LVSIL_SMALL);
 
 	InitProcessList();
@@ -58,7 +58,7 @@ LRESULT CProcessSelectDlg::OnGetDispInfo(int, LPNMHDR hdr, BOOL&) {
 	auto& item = di->item;
 	auto row = item.iItem;
 	auto col = item.iSubItem;
-	auto& data = m_Items[row];
+	const auto& data = m_Items[row];
 
 	if (item.mask & LVIF_TEXT) {
 		switch (col) {
@@ -174,8 +174,8 @@ bool CProcessSelectDlg::CompareItems(const ProcessInfo& p1, const ProcessInfo& p
 		case 0:	return SortHelper::SortStrings(p1.Name, p2.Name, asc);
 		case 1: return SortHelper::SortNumbers(p1.Id, p2.Id, asc);
 		case 2: return SortHelper::SortNumbers(p1.Session, p2.Session, asc);
-		case 3: return SortHelper::SortNumbers((int)p1.Runtime, (int)p2.Runtime, asc);
-		case 4: return SortHelper::SortNumbers((int)p1.Arch, (int)p2.Arch, asc);
+		case 3: return SortHelper::SortNumbers(p1.Runtime, p2.Runtime, asc);
+		case 4: return SortHelper::SortNumbers(p1.Arch, p2.Arch, asc);
 	}
 	ATLASSERT(false);
 	return false;

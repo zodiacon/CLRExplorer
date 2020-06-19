@@ -37,7 +37,7 @@ HRESULT __stdcall CDumpCLRDataTarget::GetMachineType(ULONG32* machineType) {
 
 	//*machineType = sysInfo.ProcessorArchitecture == PROCESSOR_ARCHITECTURE_AMD64 ? IMAGE_FILE_MACHINE_AMD64 : IMAGE_FILE_MACHINE_I386;
 
-	* machineType = sizeof(PVOID) == 8 ? IMAGE_FILE_MACHINE_AMD64 : IMAGE_FILE_MACHINE_I386;
+	*machineType = sizeof(PVOID) == 8 ? IMAGE_FILE_MACHINE_AMD64 : IMAGE_FILE_MACHINE_I386;
 
 	return S_OK;
 }

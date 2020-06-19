@@ -38,7 +38,6 @@ private:
 	LRESULT OnEditKeyDown(UINT /*uMsg*/, WPARAM wParam, LPARAM /*lParam*/, BOOL& bHandled) {
 		if (wParam == VK_ESCAPE) {
 			m_Edit.SetWindowTextW(L"");
-			bHandled = TRUE;
 			return 0;
 		}
 		bHandled = FALSE;

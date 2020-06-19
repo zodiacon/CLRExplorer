@@ -4,7 +4,7 @@
 
 class CDumpCLRDataTarget;
 
-class DumpFileDataTarget : public DataTarget{
+class DumpFileDataTarget final : public DataTarget {
 public:
 	DumpFileDataTarget(PCWSTR path);
 

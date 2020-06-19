@@ -2,6 +2,7 @@
 #include "resource.h"
 #include "ModulesView.h"
 #include "FormatHelper.h"
+#include "SortHelper.h"
 
 ModulesView::ModulesView(DataTarget* dt) : _target(dt) {
 }
@@ -45,7 +46,16 @@ CString ModulesView::GetItemText(int row, int col) {
 }
 
 bool ModulesView::Sort(int column, bool ascending) {
-	return false;
+	_modules.Sort([=](auto& m1, auto& m2) {
+		switch (column) {
+			case 0: return SortHelper::SortStrings(m1.Name, m2.Name, ascending);
+			case 1: return SortHelper::SortNumbers(m1.Address, m2.Address, ascending);
+			case 2: return SortHelper::SortNumbers(m1.Assembly, m2.Assembly , ascending);
+			case 3: return SortHelper::SortStrings(m1.FileName, m2.FileName, ascending);
+		}
+		return false;
+		});
+	return true;
 }
 
 int ModulesView::GetIcon(int row) {

@@ -56,6 +56,8 @@ BEGIN
         MENUITEM "&Attach to Process...\tF6",   ID_FILE_ATTACHTOPROCESS
         MENUITEM "&Open Dump File...\tCtrl+O",  ID_FILE_OPENDUMPFILE
         MENUITEM SEPARATOR
+        MENUITEM "Save &Heap Snapshot...",      ID_FILE_SAVEHEAPSNAPSHOT
+        MENUITEM SEPARATOR
         MENUITEM "E&xit",                       ID_APP_EXIT
     END
     POPUP "&Edit"
@@ -73,14 +75,17 @@ BEGIN
     BEGIN
         MENUITEM "&Summary",                    ID_TARGET_SUMMARY
         MENUITEM "&AppDomains",                 ID_TARGET_APPDOMAINS
-        MENUITEM "All A&ssemblies",             ID_TARGET_ALLASSEMBLIES
-        MENUITEM "All &Modules",                ID_TARGET_ALLMODULES
+        MENUITEM "A&ssemblies",                 ID_TARGET_ALLASSEMBLIES
+        MENUITEM "&Modules",                    ID_TARGET_ALLMODULES
         MENUITEM "&GC Heaps",                   ID_TARGET_GCHEAPS
         MENUITEM "&Heap Stats",                 ID_TARGET_HEAPSTATS
         MENUITEM "Th&reads",                    ID_TARGET_THREADS
         MENUITEM "Sync &Blocks",                ID_TARGET_SYNCBLOCKS
         MENUITEM "&Thread Pool",                ID_TARGET_THREADPOOL
-        MENUITEM "All Strin&gs",                ID_TARGET_ALLSTRINGS
+        MENUITEM "Strin&gs",                    ID_TARGET_ALLSTRINGS
+        MENUITEM SEPARATOR
+        MENUITEM "&Native Modules",             ID_TARGET_NATIVEMODULES
+        MENUITEM "Native Threads",              ID_TARGET_NATIVETHREADS
     END
     POPUP "&Options"
     BEGIN
@@ -181,8 +186,8 @@ CAPTION "About CLR Explorer"
 FONT 9, "Segoe UI", 0, 0, 0x0
 BEGIN
     DEFPUSHBUTTON   "OK",IDOK,68,81,50,14
-    CTEXT           "CLR Explorer v0.1\n\n(C)2019 Pavel Yosifovich",IDC_STATIC,52,30,78,32
-    ICON            IDR_MAINFRAME,IDC_STATIC,7,7,18,17
+    CTEXT           "CLR Explorer v0.1\n\n(C)2019-2020 Pavel Yosifovich",IDC_STATIC,42,30,108,32
+    ICON            IDR_MAINFRAME,IDC_STATIC,7,7,20,20
 END
 
 IDD_PROCSELECT DIALOGEX 0, 0, 381, 276
@@ -195,9 +200,8 @@ BEGIN
     CONTROL         "",IDC_PROCLIST,"SysListView32",LVS_REPORT | LVS_SINGLESEL | LVS_SHOWSELALWAYS | LVS_ALIGNLEFT | LVS_OWNERDATA | WS_BORDER | WS_TABSTOP,7,7,373,229
 END
 
-IDD_STRINGS_DIALOGBAR DIALOGEX 0, 0, 331, 20
+IDD_STRINGS_DIALOGBAR DIALOGEX 0, 0, 197, 20
 STYLE DS_SETFONT | DS_FIXEDSYS | DS_CONTROL | WS_CHILD | WS_CLIPCHILDREN
-EXSTYLE WS_EX_CLIENTEDGE
 FONT 8, "MS Shell Dlg", 400, 0, 0x0
 BEGIN
     LTEXT           "Quick Find:",IDC_STATIC,6,4,36,8
@@ -230,7 +234,7 @@ BEGIN
     IDD_STRINGS_DIALOGBAR, DIALOG
     BEGIN
         LEFTMARGIN, 6
-        RIGHTMARGIN, 324
+        RIGHTMARGIN, 190
         TOPMARGIN, 7
         BOTTOMMARGIN, 13
     END
@@ -332,7 +336,7 @@ END
 
 STRINGTABLE
 BEGIN
-    IDR_MAINFRAME           "CLR Explorer v0.1 (C)2019 Pavel Yosifovich"
+    IDR_MAINFRAME           "CLR Explorer v0.1 (C)2019-2020 Pavel Yosifovich"
     IDS_TITLE               "CLR Explorer"
 END
 

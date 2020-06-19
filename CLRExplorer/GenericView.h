@@ -6,22 +6,32 @@
 
 #include "GenericListView.h"
 #include "Interfaces.h"
+#include "ToolBarHelper.h"
+#include <atlcoll.h>
 
-class CGenericView : public CWindowImpl<CGenericView> {
+class CGenericView : 
+	public CFrameWindowImpl<CGenericView, CWindow, CControlWinTraits>,
+	public CAutoUpdateUI<CGenericView>,
+	public CToolBarHelper<CGenericView> {
 public:
-	DECLARE_WND_CLASS_EX(nullptr, 0, COLOR_WINDOW);
+	using BaseClass = CFrameWindowImpl<CGenericView, CWindow, CControlWinTraits>;
+
+	DECLARE_WND_CLASS_EX(nullptr, 0, NULL);
 
 	CGenericView(IGenericListViewCallback* listCB, IToolBarProvider* tbCB = nullptr, IDialogBarProvider* dialogBar = nullptr);
 
 	BOOL PreTranslateMessage(MSG* pMsg);
 
+	CCommandBarCtrl m_CmdBar;
+
 	virtual void OnFinalMessage(HWND /*hWnd*/);
 
 	BEGIN_MSG_MAP(CGenericView)
 		MESSAGE_HANDLER(WM_CREATE, OnCreate)
-		MESSAGE_HANDLER(WM_SIZE, OnSize)
 		MESSAGE_HANDLER(WM_COMMAND, OnCommand)
 		MESSAGE_HANDLER(WM_FORWARDMSG, OnForwardMessage)
+		CHAIN_MSG_MAP(BaseClass)
+		CHAIN_MSG_MAP(CToolBarHelper<CGenericView>)
 		REFLECT_NOTIFICATIONS()
 	ALT_MSG_MAP(1)
 		COMMAND_ID_HANDLER(ID_VIEW_REFRESH, OnRefresh)
@@ -34,7 +44,6 @@ public:
 	//	LRESULT NotifyHandler(int /*idCtrl*/, LPNMHDR /*pnmh*/, BOOL& /*bHandled*/)
 
 	LRESULT OnCreate(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/, BOOL& /*bHandled*/);
-	LRESULT OnSize(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/, BOOL& /*bHandled*/);
 	LRESULT OnCommand(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/, BOOL& /*bHandled*/);
 	LRESULT OnForwardMessage(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM /*lParam*/, BOOL& /*bHandled*/);
 	LRESULT OnRefresh(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCtl*/, BOOL& /*bHandled*/);

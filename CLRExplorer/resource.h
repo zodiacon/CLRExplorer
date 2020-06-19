@@ -56,13 +56,16 @@
 #define ID_TARGET_HEAPSTATS             32786
 #define ID_OPTIONS_ALWAYSONTOP          32791
 #define ID_HEAPSTATS_SHOWALLINSTANCES   32792
+#define ID_TARGET_NATIVEMODULES         32793
+#define ID_TARGET_NATIVETHREADS         32794
+#define ID_FILE_SAVEHEAPSNAPSHOT        32795
 
 // Next default values for new objects
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
 #define _APS_NEXT_RESOURCE_VALUE        233
-#define _APS_NEXT_COMMAND_VALUE         32793
+#define _APS_NEXT_COMMAND_VALUE         32796
 #define _APS_NEXT_CONTROL_VALUE         1004
 #define _APS_NEXT_SYMED_VALUE           102
 #endif

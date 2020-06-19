@@ -35,13 +35,13 @@ bool TreeViewManager::Init(DataTarget* dt, PCWSTR name) {
 
 	auto summary = AddNode(L"Summary", 6, NodeType::Summary, root);
 	auto appDomainsNode = AddNode(L"AppDomains", 1, NodeType::AppDomains, root);
-	auto assemblies = AddNode(L"All Assemblies", 2, NodeType::AllAssemblies, root);
-	auto modules = AddNode(L"All Modules", 3, NodeType::AllModules, root);
+	auto assemblies = AddNode(L"Assemblies", 2, NodeType::AllAssemblies, root);
+	auto modules = AddNode(L"Modules", 3, NodeType::AllModules, root);
 	auto heapStats = AddNode(L"Heap Stats", 10, NodeType::HeapStats, root);
 	auto threads = AddNode(L"Threads", 5, NodeType::Threads, root);
 	auto threadPool = AddNode(L"Thread Pool", 4, NodeType::ThreadPool, root);
 	auto syncBlocks = AddNode(L"Sync Blocks", 7, NodeType::SyncBlocks, root);
-	auto strings = AddNode(L"All Strings", 9, NodeType::AllStrings, root);
+	auto strings = AddNode(L"Strings", 9, NodeType::AllStrings, root);
 
 	root.Expand(TVE_EXPAND);
 

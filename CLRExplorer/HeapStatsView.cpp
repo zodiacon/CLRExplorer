@@ -34,7 +34,7 @@ bool HeapStatsView::Init(CListViewCtrl& lv, IGenericListView* glv) {
 }
 
 CString HeapStatsView::GetItemText(int row, int col) {
-	auto& item = _items[row];
+	const auto& item = _items[row];
 
 	switch (col) {
 		case 0: return item.TypeName;
@@ -60,7 +60,7 @@ bool HeapStatsView::Sort(int column, bool ascending) {
 }
 
 int HeapStatsView::GetIcon(int row) {
-	auto& item = _items[row];
+	const auto& item = _items[row];
 	return (int)item.Type;
 }
 
@@ -71,7 +71,7 @@ void HeapStatsView::OnContextMenu(const POINT& pt, int selected) {
 	CMenu menu;
 	menu.LoadMenuW(IDR_CONTEXT);
 	auto cmd = (UINT)_frame->ShowContextMenu(menu.GetSubMenu(0), pt, TPM_RETURNCMD);
-	auto& item = _items[selected];
+	const auto& item = _items[selected];
 
 	switch (cmd) {
 		case ID_HEAPSTATS_SHOWALLINSTANCES:
@@ -91,7 +91,7 @@ HWND HeapStatsView::Create(HWND hParent) {
 }
 
 void HeapStatsView::ShowAllInstances(int selected) {
-	auto& item = _items[selected];
+	const auto& item = _items[selected];
 	int tab = _frame->FindTab((DWORD_PTR)item.MethodTable);
 	if (tab < 0) {
 		_frame->AddTab((DWORD_PTR)item.MethodTable, NodeType::MethodTable, NodeType::HeapStats);

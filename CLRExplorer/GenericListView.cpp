@@ -37,7 +37,7 @@ LRESULT CGenericListView::OnCreate(UINT, WPARAM, LPARAM, BOOL&) {
 
 	SendMessage(LVM_QUERYINTERFACE, reinterpret_cast<WPARAM>(&__uuidof(IListView)), reinterpret_cast<LPARAM>(&m_spListView));
 
-	SetExtendedListViewStyle(LVS_EX_DOUBLEBUFFER | LVS_EX_FULLROWSELECT);
+	SetExtendedListViewStyle(LVS_EX_DOUBLEBUFFER | LVS_EX_FULLROWSELECT | LVS_EX_INFOTIP);
 
 	if (!m_Callback->Init(*this, this))
 		return -1;

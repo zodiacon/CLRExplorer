@@ -34,7 +34,7 @@ bool ObjectsView::Init(CListViewCtrl& lv, IGenericListView* glv) {
 }
 
 CString ObjectsView::GetItemText(int row, int col) {
-	auto& item = _objects[row];
+	const auto& item = _objects[row];
 
 	switch (col) {
 		case 1: return FormatHelper::ToHex(item.Address);
